@@ -1,0 +1,231 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    background-image: url("../images/senai_rio_preto.jpg");
+    background-size: cover;
+    background-position: center;
+}
+
+.list-dados-fullwidth {
+    width: 100%;
+    padding: 20px;
+}
+
+.table-responsive {
+    width: 100%;
+    margin: 0 auto;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    border-collapse: collapse;
+    font-size: 1rem;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f2f2f2;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #e6e6e6;
+}
+
+.table-striped tbody tr:hover {
+    background-color: #d4d4d4;
+}
+
+.table th, .table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border: 1px solid #dee2e6;
+    text-align: center;
+}
+
+.table th.razao-social-column, .table td.razao-social-column {
+    width: 100%;
+}
+
+.table th{
+    background-color: #333;
+    color: #fff;
+}
+
+.footer {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+    width: 100%;
+    position: relative;
+    margin-top: auto;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    height: 100%; /* Ensure full height of the header */
+}
+
+.logo-img {
+    height: 40px;
+    margin-right: 10px;
+}
+
+.logo {
+    font-weight: 700;
+    font-size: 24px;
+    color: #e60000;
+    margin: 0; /* Remove default margin */
+}
+
+.navigation a {
+    margin: 0 10px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-name {
+    margin-right: 10px;
+}
+
+.btn-primary {
+    background-color: #e60000;
+    border-color: #e60000;
+}
+
+.btn-primary:hover {
+    background-color: #cc0000;
+    border-color: #cc0000;
+}
+
+.btn-secondary {
+    background-color: #333;
+    border-color: #333;
+}
+
+.btn-secondary:hover {
+    background-color: #000;
+    border-color: #000;
+}
+
+/* Estilize o formulário */
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilizar o campo de data */
+input[type="date"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box; /* Para garantir que o padding e a borda sejam incluídos na largura total */
+    font-size: 16px;
+}
+
+.form-group .form-row {
+    margin-bottom: 15px;
+}
+
+/* Garantir que todos os inputs tenham um estilo uniforme */
+.form-control{
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box; /* Inclui padding e borda na largura total */
+    font-size: 16px;
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box; /* Inclui padding e borda na largura total */
+    font-size: 16px;
+}
+
+.form-check-input1 {
+    /* position: absolute; */
+    margin-top: .3rem;
+    /* margin-left: -1.25rem; */
+}
+
+input[type="date"] {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.text-success{
+    font-size: 18px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.text-danger{
+    font-size: 18px;
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.btn-custom1 {
+    padding: 5px;
+    font-size: 14px;
+    text-align: center;
+    background-color: midnightblue;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    margin-bottom: 5px;
+}
+
+.btn-custom1:hover {
+    background-color: mediumblue;
+    color: #fff;
+}
+
+.btn-custom2 {
+    padding: 5px;
+    font-size: 14px;
+    text-align: center;
+    background-color: slategrey;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    margin-bottom: 5px;
+}
+
+.btn-custom2:hover {
+    background-color: dimgrey;
+    color: #fff;
+}

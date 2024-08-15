@@ -1,0 +1,514 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    background-image: url("../images/senai_rio_preto.jpg");
+    background-size: cover;
+    background-position: center;
+
+}
+
+.container {
+    margin-top: 10px;
+    flex: 1; /* Ensures content takes up remaining space */
+    width: 100%;
+
+}
+
+.content-wrapper {
+    flex: 1;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    height: 100%; /* Ensure full height of the header */
+}
+
+.logo-img {
+    height: 40px;
+    margin-right: 10px;
+}
+
+.logo {
+    font-weight: 700;
+    font-size: 24px;
+    color: #e60000;
+    margin: 0; /* Remove default margin */
+}
+
+.navigation a {
+    margin: 0 10px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-name {
+    margin-right: 10px;
+}
+
+.btn-primary {
+    background-color: #e60000;
+    border-color: #e60000;
+}
+
+.btn-primary:hover {
+    background-color: #cc0000;
+    border-color: #cc0000;
+}
+
+.btn-secondary {
+    background-color: #333;
+    border-color: #333;
+}
+
+.btn-secondary:hover {
+    background-color: #000;
+    border-color: #000;
+}
+
+.btn-danger {
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}
+
+.btn-danger:hover {
+    background-color: #c9302c;
+    border-color: #ac2925;
+}
+
+.btn-login {
+    margin-top: 5vh;
+    padding: 10px 20px;
+    font-size: 20px;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+}
+
+.login-form {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-control {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.footer {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+    width: 100%;
+    position: relative; /* Mudança de fixed para relative */
+    margin-top: auto; /* Adicionar margem para afastar do conteúdo superior */
+}
+
+
+.home-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    padding: 10px 0;
+}
+
+.buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 50px;
+    width: 100%;
+    max-width: 600px;
+}
+
+
+
+
+.btn-custom {
+    padding: 30px;
+    font-size: 20px;
+    text-align: center;
+    background-color: #e60000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    box-shadow: black 2px 2px 5px;
+}
+
+.btn-custom:hover {
+    background-color: #cc0000;
+    color: #fff;
+}
+
+.btn-custom1 {
+    padding: 5px;
+    font-size: 14px;
+    text-align: center;
+    background-color: midnightblue;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    margin-bottom: 5px;
+}
+
+.btn-custom1:hover {
+    background-color: mediumblue;
+    color: #fff;
+}
+
+.btn-custom2 {
+    padding: 5px;
+    font-size: 14px;
+    text-align: center;
+    background-color: slategrey;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    margin-bottom: 5px;
+}
+
+.btn-custom2:hover {
+    background-color: dimgrey;
+    color: #fff;
+}
+
+/* Estilize o formulário */
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilizar o campo de data */
+input[type="date"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box; /* Para garantir que o padding e a borda sejam incluídos na largura total */
+    font-size: 16px;
+}
+
+.form-group .form-row {
+    margin-bottom: 15px;
+}
+
+/* Garantir que todos os inputs tenham um estilo uniforme */
+.form-control{
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box; /* Inclui padding e borda na largura total */
+    font-size: 16px;
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box; /* Inclui padding e borda na largura total */
+    font-size: 16px;
+}
+
+.form-check-input1 {
+    /* position: absolute; */
+    margin-top: .3rem;
+    /* margin-left: -1.25rem; */
+}
+
+input[type="date"] {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.btn-primary {
+    background-color: #e60000;
+    border-color: #e60000;
+}
+
+.btn-primary:hover {
+    background-color: #cc0000;
+    border-color: #cc0000;
+}
+
+/* Estilizar o campo de textarea */
+textarea.form-control {
+    resize: vertical; /* Permite redimensionar apenas verticalmente */
+    min-height: 50px; /* Define a altura mínima */
+    max-height: 50px; /* Define a altura máxima para evitar que fique muito grande */
+    width: 100%; /* Garante que o textarea ocupe toda a largura disponível */
+    padding: 10px; /* Adiciona padding interno */
+    border: 1px solid #ced4da; /* Borda consistente */
+    border-radius: 4px; /* Bordas arredondadas */
+    box-sizing: border-box; /* Inclui padding e borda na largura total */
+    font-size: 16px; /* Tamanho da fonte */
+}
+
+.form-footer {
+    display: flex;
+    justify-content: flex-end; /* Alinha o botão à direita */
+    margin-top: 20px; /* Espaçamento superior para separar do conteúdo acima */
+}
+
+/* Garantir que a tabela ocupe toda a largura disponível */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    border-collapse: collapse;
+    font-size: 0.875rem; /* Diminuir o tamanho da fonte */
+}
+
+.table th, .table td {
+    padding: 0.75rem;
+    vertical-align: middle; /* Centralizar verticalmente */
+    border: 1px solid #dee2e6;
+    text-align: center; /* Centralizar horizontalmente */
+}
+
+.table th {
+    vertical-align: middle;
+    border-bottom: 2px solid #dee2e6;
+    text-align: center;
+}
+
+.table tbody tr {
+    display: table-row; /* Garantir que cada linha se comporte como uma linha de tabela */
+    width: 100%;
+}
+
+.table tbody tr > td {
+    text-align: center;
+    flex: 1;
+}
+
+.table tbody + tbody {
+    border-top: 2px solid #dee2e6;
+}
+
+.table .table-info, .table-info {
+    background-color: #e9ecef;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+.badge-success {
+    background-color: #28a745; /* Verde */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 20px;
+}
+
+.badge-danger {
+    background-color: #dc3545; /* Vermelho */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 20px;
+}
+
+.badge-secondary {
+    background-color: #6c757d; /* Cinza */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 20px;
+}
+
+.text-success{
+    font-size: 18px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.text-danger{
+    font-size: 18px;
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.pagination-container {
+    margin: 20px 0;  /* Espaçamento vertical */
+    font-size: 1.25rem;  /* Aumenta o tamanho da fonte dentro da paginação */
+    z-index: 1;  /* Certifique-se de que está visível sobre outros elementos */
+    position: relative;  /* Ajuste conforme necessário */
+}
+
+.table-responsive {
+    overflow: visible;  /* Certifique-se de que o container não esteja ocultando a paginação */
+}
+
+.pagination {
+    padding: 10px;  /* Aumenta o padding ao redor dos links de paginação */
+}
+
+.pagination .page-item .page-link {
+    font-size: 1.25rem;  /* Aumenta o tamanho do texto dos links */
+    padding: 10px 20px;  /* Aumenta o tamanho dos botões de paginação */
+    margin: 0 5px;  /* Espaçamento entre os botões */
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;  /* Cor de fundo para o botão ativo */
+    border-color: #007bff;  /* Cor da borda para o botão ativo */
+}
+
+.pagination .page-link {
+    color: #007bff;  /* Cor dos links */
+}
+
+.pagination .page-link:hover {
+    background-color: #e9ecef;  /* Cor de fundo ao passar o mouse */
+}
+
+.list-dados-fullwidth {
+    width: 100%;
+    padding: 20px;
+}
+
+.table-responsive {
+    width: 90%;
+    position: absolute;
+    left: auto;
+    right: 5vw;
+
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 1rem; /* Remove margem inferior */
+    color: #212529;
+    border-collapse: collapse;
+    font-size: 1rem; /* Ajusta o tamanho da fonte */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f2f2f2;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #e6e6e6;
+}
+
+.table-striped tbody tr:hover {
+    background-color: #d4d4d4;
+}
+
+.table th, .table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border: 1px solid #dee2e6;
+    text-align: center;
+}
+
+.table th.razao-social-column, .table td.razao-social-column {
+    width: 100%; /* Ajuste conforme necessário */
+}
+
+.table th.curso-column, .table td.curso-column {
+    width: 20%; /* Ajuste conforme necessário */
+}
+
+.relatorios-container {
+    display: flex;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.filtro-lateral {
+    width: 250px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-right: 20px;
+}
+
+.chart-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container {
+    width: 100%;
+    max-width: 900px;
+    max-height: 700px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.btn-primary {
+    background-color: #e60000;
+    border-color: #e60000;
+}
+
+.btn-primary:hover {
+    background-color: #cc0000;
+    border-color: #cc0000;
+}

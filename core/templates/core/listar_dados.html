@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Dados - SENAI Agile</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="{% static 'css/listar_dados.css' %}" rel="stylesheet">
+</head>
+<body>
+    <header class="d-flex justify-content-between align-items-center">
+        <div class="logo-container">
+            <img src="{% static 'images/senai-logo.png' %}" alt="Logo" class="logo-img">
+            <h1 class="logo">SENAI Agile</h1>
+        </div>
+        <div class="navigation">
+            <a href="{% url 'home' %}" class="btn btn-secondary">Home</a>
+            <a href="{% url 'cadastrar-interesse' %}" class="btn btn-secondary">Cadastrar Interesse</a>
+            <a href="{% url 'cadastrar-curso' %}" class="btn btn-secondary">Cadastrar Curso</a>
+            <a href="{% url 'listar-dados' %}" class="btn btn-secondary">Listar Dados</a>
+            <a href="{% url 'relatorios' %}" class="btn btn-secondary">Gráficos</a>
+            <a href="{% url 'csv-upload' %}" class="btn btn-secondary">Importar Dados</a>
+        </div>
+        <div class="user-info">
+            {% if user.is_authenticated %}
+                <span class="user-name">Olá, {{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="list-dados-fullwidth">
+        <h2 class="text-center mb-4">Listar Dados</h2>
+
+        <form method="get" class="mb-4">
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="data_inicio">Data Início:</label>
+                    <input type="date" name="data_inicio" id="data_inicio" class="form-control">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="data_fim">Data Fim:</label>
+                    <input type="date" name="data_fim" id="data_fim" class="form-control">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="curso">Curso:</label>
+                    <select name="curso" id="curso" class="form-control">
+                        <option value="">Todos os Cursos</option>
+                        {% for curso in cursos %}
+                            <option value="{{ curso.id }}">{{ curso.nome_curso }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="realizado_contato">Realizado Contato:</label>
+                    <select name="realizado_contato" id="realizado_contato" class="form-control">
+                        <option value="">Todos</option>
+                        {% for valor, texto in realizado_contato_choices %}
+                            <option value="{{ valor }}">{{ texto }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end" >
+            <button type="submit" class="btn btn-primary" style="padding: 10px 50px;">Filtrar</button>
+        </div>
+        </form>
+
+        {% if interesses %}
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Celular</th>
+                            <th>Curso</th>
+                            <th>Data</th>
+                            <th>Contato</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for interesse in interesses %}
+                            <tr>
+                                <td>{{ interesse.razao_social }}</td>
+                                <td>{{ interesse.email }}</td>
+                                <td>{{ interesse.celular }}</td>
+                                <td>{{ interesse.curso.nome_curso }}</td>
+                                <td>{{ interesse.data_envio|date:"d/m/Y" }}</td>
+                                <td class="{% if interesse.realizado_contato == 'sim' %}text-success{% else %}text-danger{% endif %}">
+                                    {{ interesse.realizado_contato|upper }}
+                                </td>
+                                <td>
+                                    <a href="{% url 'visualizar-interesse' interesse.pk %}" class="btn btn-info btn-sm btn-custom2">Visualizar</a>
+                                    <a href="{% url 'editar-interesse' interesse.pk %}" class="btn btn-warning btn-sm btn-custom1">Editar</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-center">Nenhum dado encontrado.</p>
+        {% endif %}
+    </div>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container">
+            <p>&copy; 2024 SENAI Agile. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="relatorios-container">
+    <!-- Barra lateral para filtros -->
+    <div class="filtro-lateral">
+        <h4>Filtros</h4>
+        <form method="get" class="mb-4">
+            <div class="form-group">
+                <label for="data_inicio">Data Início:</label>
+                <input type="date" name="data_inicio" id="data_inicio" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="data_fim">Data Fim:</label>
+                <input type="date" name="data_fim" id="data_fim" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="curso">Curso:</label>
+                <select name="curso" id="curso" class="form-control">
+                    <option value="">Todos os Cursos</option>
+                    {% for curso in cursos %}
+                        <option value="{{ curso.id }}">{{ curso.nome_curso }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="realizado_contato">Realizado Contato:</label>
+                <select name="realizado_contato" id="realizado_contato" class="form-control">
+                    <option value="">Todos</option>
+                    {% for valor, texto in realizado_contato_choices %}
+                        <option value="{{ valor }}">{{ texto }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </form>
+    </div>
+
+    <!-- Conteúdo principal para o gráfico -->
+    <div class="chart-content">
+        <h2 class="text-center mb-4">Gráficos</h2>
+        <div class="chart-container text-center">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Script para renderizar o gráfico -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'pie',  // ou 'bar', 'line', etc.
+        data: {
+            labels: {{ labels|safe }},  // Labels fornecidas pela view
+            datasets: [{
+                data: {{ data|safe }},  // Dados fornecidos pela view
+                backgroundColor: ['#67d5a3', '#ea8a5d', '#5ddad6', '#007bff', '#6c757d'],
+                borderColor: '#ffffff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 8
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.label + ': ' + tooltipItem.raw + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

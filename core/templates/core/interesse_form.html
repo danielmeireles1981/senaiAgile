@@ -1,0 +1,84 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Cadastrar Interesse</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.razao_social.label_tag }}
+                {{ form.razao_social }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.telefone_comercial.label_tag }}
+                {{ form.telefone_comercial }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.celular.label_tag }}
+                {{ form.celular }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.pagina_site.label_tag }}
+                {{ form.pagina_site }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.curso.label_tag }}
+                {{ form.curso }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.cidade.label_tag }}
+                {{ form.cidade }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.cnpj.label_tag }}
+                {{ form.cnpj }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.cep.label_tag }}
+                {{ form.cep }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.nome_representante.label_tag }}
+                {{ form.nome_representante }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>{{ form.mensagem.label }}</label>
+                <div class="form-check" style="padding-left: 1.25rem;">
+                    {% for checkbox in form.mensagem %}
+                        <div class="form-check" style="margin-left: -1.25rem;">
+                            {{ checkbox.tag }}
+                            <label class="form-check-label">
+                                {{ checkbox.choice_label }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.data_envio.label_tag }}
+                {{ form.data_envio }}
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a href="{% url 'listar-dados' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

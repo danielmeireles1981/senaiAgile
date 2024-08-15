@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+    <h2 class="text-center mb-4">Bem-vindo ao SENAI Agile</h2>
+    <div class="home-container">
+    <div class="buttons-grid">
+        <a href="{% url 'cadastrar-interesse' %}" class="btn btn-custom">Cadastrar Interesse</a>
+        <a href="{% url 'cadastrar-curso' %}" class="btn btn-custom">Cadastrar Curso</a>
+        <a href="{% url 'listar-dados' %}" class="btn btn-custom">Listar Dados</a>
+        <a href="{% url 'relatorios' %}" class="btn btn-custom">Relatórios</a>
+        <a href="{% url 'csv-upload' %}" class="btn btn-custom">Importar Dados</a> <!-- Novo botão -->
+    </div>
+</div>
+{% endblock %}
+

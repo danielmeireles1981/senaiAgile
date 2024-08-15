@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Importar Arquivo CSV - Registros do Site</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="csv_file">Escolher Arquivo CSV:</label>
+            <input type="file" name="csv_file" id="csv_file" class="form-control-file" style="margin: 20px 0; padding: 10px;">
+        </div>
+        <button type="submit" class="btn btn-primary">Importar</button>
+    </form>
+
+    {% if log_messages %}
+        <div class="mt-5">
+            <h4>Log de Importação:</h4>
+            <ul class="list-group">
+                {% for message in log_messages %}
+                    <li class="list-group-item">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
