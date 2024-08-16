@@ -132,6 +132,9 @@ header {
     margin-top: auto; /* Adicionar margem para afastar do conteúdo superior */
 }
 
+.footer p {
+    margin: 0;
+}
 
 .home-container {
     display: flex;
@@ -283,7 +286,6 @@ textarea.form-control {
 .form-footer {
     display: flex;
     justify-content: flex-end; /* Alinha o botão à direita */
-    margin-top: 20px; /* Espaçamento superior para separar do conteúdo acima */
 }
 
 /* Garantir que a tabela ocupe toda a largura disponível */

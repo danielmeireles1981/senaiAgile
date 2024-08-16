@@ -1,6 +1,39 @@
-{% extends 'core/base.html' %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - SENAI Agile</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="{% static 'css/listar_dados.css' %}" rel="stylesheet">
+    <link href="{% static 'css/relatorios.css' %}" rel="stylesheet">
+</head>
+<body>
+<header class="d-flex justify-content-between align-items-center">
+    <div class="logo-container">
+        <img src="{% static 'images/senai-logo.png' %}" alt="Logo" class="logo-img">
+        <h1 class="logo">SENAI Agile</h1>
+    </div>
+    <div class="navigation">
+        <a href="{% url 'home' %}" class="btn btn-secondary">Home</a>
+        <a href="{% url 'cadastrar-interesse' %}" class="btn btn-secondary">Cadastrar Interesse</a>
+        <a href="{% url 'cadastrar-curso' %}" class="btn btn-secondary">Cadastrar Curso</a>
+        <a href="{% url 'listar-dados' %}" class="btn btn-secondary">Listar Dados</a>
+        <a href="{% url 'relatorios' %}" class="btn btn-secondary">Gráficos</a>
+        <a href="{% url 'csv-upload' %}" class="btn btn-secondary">Importar Dados</a>
+    </div>
+    <div class="user-info">
+        {% if user.is_authenticated %}
+            <span class="user-name">Olá, {{ user.username }}</span>
+            <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+        {% endif %}
+    </div>
+</header>
 
-{% block content %}
 <div class="relatorios-container">
     <!-- Barra lateral para filtros -->
     <div class="filtro-lateral">
@@ -39,47 +72,23 @@
     <!-- Conteúdo principal para o gráfico -->
     <div class="chart-content">
         <h2 class="text-center mb-4">Gráficos</h2>
-        <div class="chart-container text-center">
+        <div class="chart-container">
             <canvas id="myChart"></canvas>
         </div>
     </div>
 </div>
 
-<!-- Script para renderizar o gráfico -->
+<footer class="footer mt-auto py-3">
+    <div class="container">
+        <p>&copy; 2024 SENAI Agile. Todos os direitos reservados.</p>
+    </div>
+</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-        type: 'pie',  // ou 'bar', 'line', etc.
-        data: {
-            labels: {{ labels|safe }},  // Labels fornecidas pela view
-            datasets: [{
-                data: {{ data|safe }},  // Dados fornecidos pela view
-                backgroundColor: ['#67d5a3', '#ea8a5d', '#5ddad6', '#007bff', '#6c757d'],
-                borderColor: '#ffffff',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        font: {
-                            size: 8
-                        }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(tooltipItem) {
-                            return tooltipItem.label + ': ' + tooltipItem.raw + '%';
-                        }
-                    }
-                }
-            }
-        }
-    });
+    var labels = {{ labels|safe }};
+    var data = {{ data|safe }};
 </script>
-{% endblock %}
+<script src="{% static 'js/relatorio.js' %}"></script> <!-- Referência ao script -->
+</body>
+</html>

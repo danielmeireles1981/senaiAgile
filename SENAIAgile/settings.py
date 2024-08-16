@@ -111,11 +111,16 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
 USE_I18N = True
 
-USE_TZ = True
+# Defina o fuso horário para o seu local
+TIME_ZONE = 'America/Sao_Paulo'  # Substitua pelo seu fuso horário
+
+# Use o uso do timezone em todo o projeto
+USE_TZ = True  # Certifique-se de que o uso de timezone esteja ativado
+
+# Ative o suporte para fuso horário no Django
+USE_L10N = True
 
 
 # Static files (CSS, JavaScript, Images)

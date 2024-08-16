@@ -54,7 +54,7 @@ html, body {
 }
 
 .table th{
-    background-color: #333;
+    background-color: #e60000;
     color: #fff;
 }
 
@@ -64,8 +64,12 @@ html, body {
     padding: 10px 0;
     text-align: center;
     width: 100%;
-    position: relative;
-    margin-top: auto;
+    position: relative; /* Mudança de fixed para relative */
+    margin-top: auto; /* Adicionar margem para afastar do conteúdo superior */
+}
+
+.footer p {
+    margin: 0;
 }
 
 header {
@@ -183,19 +187,19 @@ input[type="date"] {
 }
 
 .text-success{
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     color: #28a745;
 }
 
 .text-danger{
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     color: #dc3545;
 }
 
 .btn-custom1 {
-    padding: 5px;
+    padding: 10px 5px;
     font-size: 14px;
     text-align: center;
     background-color: midnightblue;
@@ -213,7 +217,7 @@ input[type="date"] {
 }
 
 .btn-custom2 {
-    padding: 5px;
+    padding: 10px 5px;
     font-size: 14px;
     text-align: center;
     background-color: slategrey;
@@ -228,4 +232,14 @@ input[type="date"] {
 .btn-custom2:hover {
     background-color: dimgrey;
     color: #fff;
+}
+
+.page-item .page-link {
+    color: #e60000;
+}
+
+.page-item.active .page-link {
+    color: white;
+    background-color: #e60000;
+    border-color: #e60000;
 }

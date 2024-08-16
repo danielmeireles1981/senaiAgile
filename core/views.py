@@ -7,7 +7,6 @@ from django.views.generic import TemplateView, ListView, DetailView, UpdateView,
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
-from django.db.models import Count
 from .forms import LoginForm, InteresseForm, CursoForm, EditarInteresseForm
 import logging
 from django.db.models import OuterRef, Subquery
@@ -15,9 +14,6 @@ import csv
 from django.contrib import messages
 import chardet  # Biblioteca para detectar codificação
 from django.db.models import Exists, OuterRef, Q, Value
-import matplotlib.pyplot as plt
-import base64
-from io import BytesIO
 from datetime import datetime, time
 from django.db.models import Count
 from django.shortcuts import render
@@ -90,6 +86,7 @@ class ListarDadosView ( LoginRequiredMixin, ListView ):
     model = Interesse
     template_name = 'core/listar_dados.html'
     context_object_name = 'interesses'
+    paginate_by = 5  # Define 5 registros por página
 
 
     def get_queryset(self):
@@ -258,63 +255,74 @@ class LogoutView(LoginRequiredMixin, View):
         return redirect('login')
 
 
-class CSVUploadView ( View ):
+class CSVUploadView(View):
     template_name = 'core/csv_upload.html'
 
     def get(self, request, *args, **kwargs):
-        return render ( request, self.template_name )
+        return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
-        csv_file = request.FILES.get ( 'csv_file' )
+        csv_file = request.FILES.get('csv_file')
         log_messages = []
 
-        if not csv_file.name.endswith ( '.csv' ):
-            log_messages.append ( 'Por favor, envie um arquivo CSV.' )
-            return render ( request, self.template_name, {'log_messages': log_messages} )
+        if not csv_file.name.endswith('.csv'):
+            log_messages.append('Por favor, envie um arquivo CSV.')
+            return render(request, self.template_name, {'log_messages': log_messages})
 
         try:
             # Detectar a codificação do arquivo
-            raw_data = csv_file.read ()
-            result = chardet.detect ( raw_data )
+            raw_data = csv_file.read()
+            result = chardet.detect(raw_data)
             encoding = result['encoding']
 
             # Decodificar o arquivo com a codificação detectada
-            decoded_file = raw_data.decode ( encoding ).splitlines ()
-            reader = csv.DictReader ( decoded_file, delimiter=';' )
+            decoded_file = raw_data.decode(encoding).splitlines()
+            reader = csv.DictReader(decoded_file, delimiter=';')
 
             for row in reader:
                 try:
                     # Converter a data de envio para o formato correto
-                    data_envio = datetime.strptime ( row['Data Envio'], '%d/%m/%Y %H:%M' )
+                    data_envio = datetime.strptime(row['Data Envio'], '%d/%m/%Y %H:%M')
 
-                    curso, created = Curso.objects.get_or_create (
+                    curso, created = Curso.objects.get_or_create(
                         codigo_curso=row['Id Curso'],
                         defaults={'nome_curso': row['Nome Curso']}
                     )
 
                     if created:
-                        log_messages.append ( f"Curso {row['Nome Curso']} criado com sucesso." )
+                        log_messages.append(f"Curso {row['Nome Curso']} criado com sucesso.")
 
-                    Interesse.objects.create (
-                        razao_social=row['Razão Social'],
+                    # Verificação de duplicatas baseando-se em email, curso e data de envio
+                    interesse_exists = Interesse.objects.filter(
                         email=row['E-mail'],
-                        pagina_site=row['Site'],
-                        data_envio=data_envio,  # Usando a data convertida
-                        telefone_comercial=row['Telefone Comercial'],
-                        celular=row['Celular'],
-                        nome_representante=row['Nome Representante'],
-                        cnpj=row['CNPJ'],
-                        cep=row['CEP'],
-                        cidade=row['Cidade'],
-                        mensagem=row['Mensagem'],
-                        curso=curso
-                    )
-                    log_messages.append ( f"Interesse de {row['Razão Social']} importado com sucesso." )
-                except Exception as e:
-                    log_messages.append ( f"Erro ao importar interesse {row['Razão Social']}: {e}" )
+                        curso=curso,
+                        data_envio=data_envio
+                    ).exists()
 
-            return render ( request, self.template_name, {'log_messages': log_messages} )
+                    if not interesse_exists:
+                        Interesse.objects.create(
+                            razao_social=row['Razão Social'],
+                            email=row['E-mail'],
+                            pagina_site=row['Site'],
+                            data_envio=data_envio,  # Usando a data convertida
+                            telefone_comercial=row['Telefone Comercial'],
+                            celular=row['Celular'],
+                            nome_representante=row['Nome Representante'],
+                            cnpj=row['CNPJ'],
+                            cep=row['CEP'],
+                            cidade=row['Cidade'],
+                            mensagem=row['Mensagem'],
+                            curso=curso
+                        )
+                        log_messages.append(f"Interesse de {row['Razão Social']} importado com sucesso.")
+                    else:
+                        log_messages.append(f"Interesse de {row['Razão Social']} já existe e foi ignorado.")
+
+                except Exception as e:
+                    log_messages.append(f"Erro ao importar interesse {row['Razão Social']}: {e}")
+
+            return render(request, self.template_name, {'log_messages': log_messages})
 
         except Exception as e:
-            log_messages.append ( f'Erro ao processar o arquivo: {e}' )
-            return render ( request, self.template_name, {'log_messages': log_messages} )
+            log_messages.append(f'Erro ao processar o arquivo: {e}')
+            return render(request, self.template_name, {'log_messages': log_messages})

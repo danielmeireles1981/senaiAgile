@@ -3,6 +3,7 @@
 {% block content %}
 <div class="container">
     <h2 class="text-center mb-4">Visualizar Interesse</h2>
+    <form>
     <div class="form-group row">
         <label class="col-sm-2 col-form-label">Nome:</label>
         <div class="col-sm-10">
@@ -63,6 +64,7 @@
             <textarea readonly class="form-control" rows="3">{{ observacoes }}</textarea>
         </div>
     </div>
+    </form>
     <div class="form-footer">
         <a href="{% url 'listar-dados' %}" class="btn btn-secondary">Voltar</a>
     </div>
