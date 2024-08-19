@@ -1,24 +1,24 @@
 import uuid
-from django.db import models
-from django.utils import timezone  # Certifique-se de importar corretamente
-from django.contrib.auth.views import LoginView as BaseLoginView
-from django.urls import reverse_lazy
-from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
-from django.contrib.auth import logout
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, render
-from .forms import LoginForm, InteresseForm, CursoForm, EditarInteresseForm
 import logging
-from django.db.models import OuterRef, Subquery
 import csv
-from django.contrib import messages
 import chardet  # Biblioteca para detectar codificação
-from django.db.models import Exists, OuterRef, Q, Value
-from datetime import datetime, time
-from django.db.models import Count
-from django.shortcuts import render
+from django.views.generic import TemplateView, ListView, DetailView, CreateView
 from django.views import View
+from django.utils import timezone  # Certifique-se de importar corretamente
+from django.urls import reverse_lazy
+from django.shortcuts import redirect, render
+from django.db.models import Subquery
+from django.db.models import Exists, OuterRef, Q
+from django.db.models import Count
+from django.db import models
+from django.contrib.auth.views import LoginView as BaseLoginView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import logout
+from django.contrib import messages
+from datetime import datetime, time
 from .models import Interesse, Curso, RegistroEdicaoInteresse
+from .forms import LoginForm, InteresseForm, CursoForm, EditarInteresseForm
+
 
 # Configure o logger
 logger = logging.getLogger(__name__)
