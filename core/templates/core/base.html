@@ -22,6 +22,7 @@
             <a href="{% url 'listar-dados' %}" class="btn btn-secondary">Listar Dados</a>
             <a href="{% url 'relatorios' %}" class="btn btn-secondary">Gráficos</a>
             <a href="{% url 'csv-upload' %}" class="btn btn-secondary">Importar Dados</a> <!-- Novo link -->
+            <a href="{% url 'admin' %}" class="btn btn-secondary">Administração</a> <!-- Novo link -->
         </div>
         <div class="user-info">
             {% if user.is_authenticated %}

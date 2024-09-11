@@ -17,4 +17,5 @@ urlpatterns = [
     path('cadastrar-interesse/', InteresseCreateView.as_view(), name='cadastrar-interesse'),
     path('cadastrar-curso/', CursoCreateView.as_view(), name='cadastrar-curso'),
     path('importar-csv/', CSVUploadView.as_view(), name='csv-upload'),
+    path('admin/', auth_views.LoginView.as_view(), name='admin'),
 ]
