@@ -90,17 +90,19 @@ class EditarInteresseForm(forms.ModelForm):
         ('email', 'Email'),
     ]
 
-    forma_contato = forms.ChoiceField (
+    forma_contato = forms.ChoiceField(
         choices=FORMA_CONTATO_CHOICES,
-        widget=forms.Select ( attrs={'class': 'form-control'} ),
+        widget=forms.Select(attrs={'class': 'form-control'}),
         label="Forma de Contato"
     )
+
     class Meta:
         model = RegistroEdicaoInteresse
-        fields = ['realizada_contato', 'forma_contato', 'observacoes']
+        fields = ['realizada_contato', 'forma_contato', 'observacoes', 'arquivo_evidencia']  # Incluindo o campo arquivo_evidencia
         widgets = {
             'realizada_contato': forms.Select(choices=RegistroEdicaoInteresse.REALIZADO_CONTATO_CHOICES, attrs={'class': 'form-control'}),
             'observacoes': forms.Textarea(attrs={'class': 'form-control'}),
+            'arquivo_evidencia': forms.FileInput(attrs={'class': 'form-control'})  # Novo widget para upload de arquivo
         }
 
     def __init__(self, *args, **kwargs):

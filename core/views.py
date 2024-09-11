@@ -173,6 +173,8 @@ class EditarInteresseView(LoginRequiredMixin, CreateView):
         registro.numero_atendimento = uuid.uuid4()  # Gerar número de atendimento
         registro.usuario = self.request.user.username  # Adiciona o nome do usuário logado
         registro.data_hora_registro = timezone.now()  # Adicionar data/hora do registro
+        if 'arquivo_evidencia' in form.files:  # Verifica se um arquivo foi enviado
+            registro.arquivo_evidencia = form.files['arquivo_evidencia']
         registro.save()
         return super().form_valid(form)
 
@@ -183,6 +185,7 @@ class EditarInteresseView(LoginRequiredMixin, CreateView):
         context['numero_atendimento'] = uuid.uuid4()  # Gera um novo número de atendimento para exibição
         context['data_hora_registro'] = timezone.now()  # Data/hora atual para exibição
         return context
+
 
 class RelatoriosView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):

@@ -42,6 +42,7 @@ class RegistroEdicaoInteresse(models.Model):
     observacoes = models.TextField()
     editado_em = models.DateTimeField(auto_now_add=True)
     usuario = models.CharField(max_length=150)  # Novo campo para armazenar o nome do usuário
+    arquivo_evidencia = models.FileField ( upload_to='evidencias/', blank=True, null=True )
 
     def __str__(self):
         return f'Edição de {self.interesse.nome_representante} em {self.editado_em}'

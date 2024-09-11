@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
     <h2 class="text-center mb-4">Editar Interesse</h2>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <!-- Exibição dos campos existentes do Interesse para visualização, sem edição -->
         <fieldset disabled="disabled">
@@ -78,6 +78,10 @@
             <label for="observacoes">Observações</label>
             {{ form.observacoes }}
         </div>
+        <div class="form-group">
+            <label for="arquivo_evidencia">Upload de Evidência</label>
+            {{ form.arquivo_evidencia }}
+        </div>
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="numero_atendimento">Número de Atendimento</label>
@@ -88,7 +92,6 @@
                 <input type="text" id="data_hora_registro" class="form-control" value="{{ data_hora_registro }}" readonly>
             </div>
         </div>
-
 
         <div class="form-footer">
             <button type="submit" class="btn btn-primary" style="margin-right: 10px">Salvar Alterações</button>
