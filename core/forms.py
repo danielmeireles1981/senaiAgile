@@ -75,9 +75,15 @@ class InteresseForm(forms.ModelForm):
     )
 
 class CursoForm(forms.ModelForm):
+    csv_file = forms.FileField(
+        required=False,
+        label='Upload de CSV',
+        widget=forms.FileInput(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = Curso
-        fields = ['codigo_curso', 'nome_curso']
+        fields = ['codigo_curso', 'nome_curso', 'csv_file']  # Inclui o campo csv_file
         widgets = {
             'codigo_curso': forms.TextInput(attrs={'class': 'form-control'}),
             'nome_curso': forms.TextInput(attrs={'class': 'form-control'}),

@@ -5,6 +5,7 @@
     <h2 class="text-center mb-4">Cadastrar Interesse</h2>
     <form method="post">
         {% csrf_token %}
+
         <div class="form-row">
             <div class="form-group col-md-6">
                 {{ form.razao_social.label_tag }}
@@ -15,6 +16,8 @@
                 {{ form.email }}
             </div>
         </div>
+
+        <!-- Continue com os campos existentes -->
         <div class="form-row">
             <div class="form-group col-md-6">
                 {{ form.telefone_comercial.label_tag }}
@@ -72,6 +75,8 @@
             <div class="form-group col-md-6">
                 {{ form.data_envio.label_tag }}
                 {{ form.data_envio }}
+                <label for="usuario_logado">Usuário Conectado:</label>
+                <input type="text" id="usuario_logado" class="form-control" value="{{ user.username }}" readonly>
             </div>
         </div>
 

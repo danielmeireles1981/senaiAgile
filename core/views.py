@@ -18,7 +18,7 @@ from django.contrib import messages
 from datetime import datetime, time
 from .models import Interesse, Curso, RegistroEdicaoInteresse
 from .forms import LoginForm, InteresseForm, CursoForm, EditarInteresseForm
-
+import logging
 
 # Configure o logger
 logger = logging.getLogger(__name__)
@@ -72,62 +72,120 @@ class InteresseCreateView(LoginRequiredMixin, CreateView):
         logger.warning('Formulário inválido: %s', form.errors)
         return super().form_invalid(form)
 
-class CursoCreateView(LoginRequiredMixin, CreateView):
-    model = Curso
-    form_class = CursoForm
+
+class CursoCreateView(LoginRequiredMixin, View):
     template_name = 'core/curso_form.html'
     success_url = reverse_lazy('cadastrar-curso')
+
+    def get(self, request, *args, **kwargs):
+        # Exibe o formulário da página
+        form = CursoForm()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        # Verifica se um arquivo CSV foi enviado
+        csv_file = request.FILES.get('csv_file')
+        if csv_file:
+            try:
+                # Detecta a codificação do arquivo
+                raw_data = csv_file.read()
+                result = chardet.detect(raw_data)
+                encoding = result['encoding']
+                logger.info(f"Arquivo CSV detectado com codificação: {encoding}")
+
+                # Decodifica o arquivo com a codificação detectada
+                decoded_file = raw_data.decode(encoding).splitlines()
+
+                # Remover BOM, se presente
+                if decoded_file[0].startswith('\ufeff'):
+                    decoded_file[0] = decoded_file[0].replace('\ufeff', '')
+                    logger.info("BOM encontrado e removido do arquivo CSV.")
+
+                reader = csv.DictReader(decoded_file, delimiter=';')
+
+                cursos_criados = 0
+                cursos_ignorados = 0
+
+                # Iterando por cada linha do CSV
+                for linha in reader:
+                    codigo_curso = linha['codigo_curso'].strip()
+                    nome_curso = linha['nome_curso'].strip()
+
+                    # Verifica se o curso já existe no banco de dados
+                    if not Curso.objects.filter(codigo_curso=codigo_curso).exists():
+                        Curso.objects.create(codigo_curso=codigo_curso, nome_curso=nome_curso)
+                        cursos_criados += 1
+                        logger.info(f"Curso {nome_curso} criado com sucesso.")
+                    else:
+                        cursos_ignorados += 1
+                        logger.warning(f"Curso {nome_curso} já existe, ignorado.")
+
+                messages.success(self.request, f"{cursos_criados} cursos criados com sucesso, {cursos_ignorados} cursos ignorados.")
+                return redirect(self.success_url)
+
+            except csv.Error as e:
+                logger.error(f"Erro ao processar o arquivo CSV: {e}")
+                messages.error(self.request, f"Erro ao processar o arquivo CSV: {e}")
+                return redirect(self.success_url)
+
+            except Exception as e:
+                logger.error(f"Erro desconhecido durante a importação: {e}")
+                messages.error(self.request, f"Erro desconhecido durante a importação: {e}")
+                return redirect(self.success_url)
+
+        messages.error(self.request, "Por favor, selecione um arquivo CSV.")
+        return redirect(self.success_url)
+
 
 class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'core/home.html'
 
 
-class ListarDadosView ( LoginRequiredMixin, ListView ):
+class ListarDadosView(LoginRequiredMixin, ListView):
     model = Interesse
     template_name = 'core/listar_dados.html'
     context_object_name = 'interesses'
     paginate_by = 5  # Define 5 registros por página
 
-
     def get_queryset(self):
         # Inicializando o queryset
-        queryset = super ().get_queryset ()
+        queryset = super().get_queryset()
 
         # Subquery para obter o status mais recente de "realizado_contato" para cada Interesse
-        latest_edicao = RegistroEdicaoInteresse.objects.filter (
-            interesse_id=OuterRef ( 'pk' )
-        ).order_by ( '-data_hora_registro' )
+        latest_edicao = RegistroEdicaoInteresse.objects.filter(
+            interesse_id=OuterRef('pk')
+        ).order_by('-data_hora_registro')
 
-        queryset = queryset.annotate (
-            realizado_contato=Subquery ( latest_edicao.values ( 'realizada_contato' )[:1] )
-        ).order_by ( 'data_envio' )
+        queryset = queryset.annotate(
+            realizado_contato=Subquery(latest_edicao.values('realizada_contato')[:1])
+        ).order_by('data_envio')
 
         # Filtros existentes de data
-        data_inicio = self.request.GET.get ( 'data_inicio' )
-        data_fim = self.request.GET.get ( 'data_fim' )
+        data_inicio = self.request.GET.get('data_inicio')
+        data_fim = self.request.GET.get('data_fim')
 
         if data_inicio and data_fim:
             try:
-                data_inicio = datetime.combine ( datetime.strptime ( data_inicio, "%Y-%m-%d" ).date (), time.min )
-                data_fim = datetime.combine ( datetime.strptime ( data_fim, "%Y-%m-%d" ).date (), time.max )
-                queryset = queryset.filter ( data_envio__range=[data_inicio, data_fim] )
+                data_inicio = datetime.combine(datetime.strptime(data_inicio, "%Y-%m-%d").date(), time.min)
+                data_fim = datetime.combine(datetime.strptime(data_fim, "%Y-%m-%d").date(), time.max)
+                queryset = queryset.filter(data_envio__range=[data_inicio, data_fim])
             except Exception as e:
-                logger.error ( f"Erro ao processar as datas: {e}" )
+                logger.error(f"Erro ao processar as datas: {e}")
 
         # Filtro por curso
-        curso = self.request.GET.get ( 'curso' )
+        curso = self.request.GET.get('curso')
         if curso:
-            queryset = queryset.filter ( curso__id=curso )
+            queryset = queryset.filter(curso__id=curso)
 
         # Filtro por realizado_contato
-        realizado_contato = self.request.GET.get ( 'realizado_contato' )
+        realizado_contato = self.request.GET.get('realizado_contato', 'nao')  # Padrão é 'não'
 
         if realizado_contato == 'nao':
-            queryset = queryset.filter (
-                models.Q ( realizado_contato__iexact='nao' ) | models.Q ( realizado_contato__isnull=True )
+            queryset = queryset.filter(
+                models.Q(realizado_contato__iexact='nao') | models.Q(realizado_contato__isnull=True)
             )
         elif realizado_contato:
-            queryset = queryset.filter ( realizado_contato__iexact=realizado_contato )
+            queryset = queryset.filter(realizado_contato__iexact=realizado_contato)
 
         # Substituindo valores 'None' por 'NÃO' para o campo realizado_contato
         for interesse in queryset:
@@ -137,10 +195,18 @@ class ListarDadosView ( LoginRequiredMixin, ListView ):
         return queryset
 
     def get_context_data(self, **kwargs):
-        context = super ().get_context_data ( **kwargs )
-        context['cursos'] = Curso.objects.all ().order_by ( 'nome_curso' )
+        context = super().get_context_data(**kwargs)
+        context['cursos'] = Curso.objects.all().order_by('nome_curso')
         context['realizado_contato_choices'] = RegistroEdicaoInteresse.REALIZADO_CONTATO_CHOICES
+
+        # Definir 'realizado_contato' como 'nao' no contexto, caso não tenha sido enviado
+        if not self.request.GET.get('realizado_contato'):
+            context['selected_realizado_contato'] = 'nao'
+        else:
+            context['selected_realizado_contato'] = self.request.GET.get('realizado_contato')
+
         return context
+
 
 
 class VisualizarInteresseView ( LoginRequiredMixin, DetailView ):

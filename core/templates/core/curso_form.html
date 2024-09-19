@@ -1,15 +1,34 @@
 {% extends 'core/base.html' %}
-{% block title %}Cadastro de Curso - SENAI Agile{% endblock %}
+
 {% block content %}
 <div class="container">
     <h2 class="text-center mb-4">Cadastrar Curso</h2>
-    <form method="post">
+
+    <!-- Formulário para criação manual de cursos -->
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <div class="form-footer">
-            <button type="submit" class="btn btn-primary" style="margin-right: 10px">Salvar</button>
-            <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
+        <div class="form-group">
+            <label for="codigo_curso">Código do Curso:</label>
+            {{ form.codigo_curso }}
         </div>
+        <div class="form-group">
+            <label for="nome_curso">Nome do Curso:</label>
+            {{ form.nome_curso }}
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar Curso</button>
+    </form>
+
+    <hr/>
+
+    <!-- Formulário para importação de CSV -->
+    <h4>Importar Cursos via CSV</h4>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="csv_file">Selecione o Arquivo CSV:</label>
+            <input type="file" name="csv_file" id="csv_file" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Importar CSV</button>
     </form>
 </div>
 {% endblock %}

@@ -67,10 +67,10 @@
 
     <!-- Exibição do anexo -->
     <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Anexo:</label>
+        <label class="col-sm-2 col-form-label">Evidencia:</label>
         <div class="col-sm-10">
             {% if interesse.edicoes.last.arquivo_evidencia %}
-                <a href="{{ interesse.edicoes.last.arquivo_evidencia.url }}" target="_blank" class="btn btn-info">Ver Anexo</a>
+                <a href="{{ interesse.edicoes.last.arquivo_evidencia.url }}" target="_blank" class="btn btn-primary">Ver Anexo</a>
             {% else %}
                 <p>Nenhum anexo disponível.</p>
             {% endif %}
