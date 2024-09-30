@@ -1,5 +1,4 @@
 import uuid
-import logging
 import csv
 import chardet  # Biblioteca para detectar codificação
 from django.views.generic import TemplateView, ListView, DetailView, CreateView
@@ -17,8 +16,10 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from datetime import datetime, time
 from .models import Interesse, Curso, RegistroEdicaoInteresse
-from .forms import LoginForm, InteresseForm, CursoForm, EditarInteresseForm
+from .forms import LoginForm, InteresseForm, CursoForm, EditarInteresseForm, RegistroEdicaoInteresseFormSet
 import logging
+from django.forms import modelformset_factory
+from django.shortcuts import get_object_or_404
 
 # Configure o logger
 logger = logging.getLogger(__name__)
@@ -225,6 +226,7 @@ class VisualizarInteresseView ( LoginRequiredMixin, DetailView ):
 
         return context
 
+
 class EditarInteresseView(LoginRequiredMixin, CreateView):
     model = RegistroEdicaoInteresse
     form_class = EditarInteresseForm
@@ -232,17 +234,39 @@ class EditarInteresseView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('listar-dados')
 
     def form_valid(self, form):
-        interesse_id = self.kwargs.get('pk')
-        interesse = Interesse.objects.get(id=interesse_id)
-        registro = form.save(commit=False)
-        registro.interesse = interesse
-        registro.numero_atendimento = uuid.uuid4()  # Gerar número de atendimento
-        registro.usuario = self.request.user.username  # Adiciona o nome do usuário logado
-        registro.data_hora_registro = timezone.now()  # Adicionar data/hora do registro
-        if 'arquivo_evidencia' in form.files:  # Verifica se um arquivo foi enviado
-            registro.arquivo_evidencia = form.files['arquivo_evidencia']
-        registro.save()
-        return super().form_valid(form)
+        try:
+            interesse_id = self.kwargs.get('pk')
+            interesse = Interesse.objects.get(id=interesse_id)
+
+            # Log dos dados recebidos no formulário
+            logger.info(f"Dados do formulário de edição recebidos: {form.cleaned_data}")
+
+            # Criar um novo registro de atendimento
+            registro = form.save(commit=False)
+            registro.interesse = interesse
+            registro.numero_atendimento = uuid.uuid4()  # Gerar número de atendimento
+            registro.usuario = self.request.user.username  # Adiciona o nome do usuário logado
+            registro.data_hora_registro = timezone.now()  # Adicionar data/hora do registro
+
+            # Verificar se um arquivo foi enviado e associar ao registro
+            if 'arquivo_evidencia' in form.files:
+                registro.arquivo_evidencia = form.files['arquivo_evidencia']
+
+            registro.save()
+            messages.success(self.request, "Atendimento registrado com sucesso.")
+            return super().form_valid(form)
+
+        except Exception as e:
+            # Captura qualquer erro que ocorrer durante o processo e registra no log
+            logger.error(f"Erro ao salvar o registro de atendimento: {e}")
+            messages.error(self.request, "Erro ao atualizar interesse. Verifique os dados e tente novamente.")
+            return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        # Registrar os erros do formulário para análise
+        logger.warning(f"Formulário inválido: {form.errors}")
+        messages.error(self.request, "Erro ao atualizar interesse. Verifique os dados e tente novamente.")
+        return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -348,48 +372,59 @@ class CSVUploadView(View):
             decoded_file = raw_data.decode(encoding).splitlines()
             reader = csv.DictReader(decoded_file, delimiter=';')
 
-            for row in reader:
-                try:
-                    # Converter a data de envio para o formato correto
-                    data_envio = datetime.strptime(row['Data Envio'], '%d/%m/%Y %H:%M')
+            interesses_importados = 0
+            interesses_duplicados = 0
+            linha_atual = 1  # Para acompanhar a linha processada
 
+            for row in reader:
+                linha_atual += 1
+                try:
+                    # Verificar se o curso já existe ou criar um novo
                     curso, created = Curso.objects.get_or_create(
                         codigo_curso=row['Id Curso'],
                         defaults={'nome_curso': row['Nome Curso']}
                     )
 
-                    if created:
-                        log_messages.append(f"Curso {row['Nome Curso']} criado com sucesso.")
-
-                    # Verificação de duplicatas baseando-se em email, curso e data de envio
+                    # Verificar se já existe um interesse com o mesmo email e curso (sem verificar data_envio)
                     interesse_exists = Interesse.objects.filter(
                         email=row['E-mail'],
-                        curso=curso,
-                        data_envio=data_envio
+                        curso=curso
                     ).exists()
 
                     if not interesse_exists:
+                        # Criar novo interesse
                         Interesse.objects.create(
                             razao_social=row['Razão Social'],
                             email=row['E-mail'],
-                            pagina_site=row['Site'],
-                            data_envio=data_envio,  # Usando a data convertida
-                            telefone_comercial=row['Telefone Comercial'],
-                            celular=row['Celular'],
-                            nome_representante=row['Nome Representante'],
-                            cnpj=row['CNPJ'],
-                            cep=row['CEP'],
+                            pagina_site=row.get('Site', ''),
+                            telefone_comercial=row.get('Telefone Comercial', ''),
+                            celular=row.get('Celular', ''),
+                            nome_representante=row.get('Nome Representante', ''),
+                            cnpj=row.get('CNPJ', ''),
+                            cep=row.get('CEP', ''),
                             cidade=row['Cidade'],
-                            mensagem=row['Mensagem'],
+                            mensagem=row.get('Mensagem', ''),
+                            data_envio=datetime.now(),  # Adicionando a data e hora atual
                             curso=curso
                         )
+                        interesses_importados += 1
                         log_messages.append(f"Interesse de {row['Razão Social']} importado com sucesso.")
                     else:
+                        interesses_duplicados += 1
                         log_messages.append(f"Interesse de {row['Razão Social']} já existe e foi ignorado.")
 
+                except KeyError as e:
+                    log_messages.append(f"Erro ao processar a linha {linha_atual}: chave ausente - {e}")
+                    continue
+                except ValueError as e:
+                    log_messages.append(f"Erro ao processar a linha {linha_atual}: erro de valor - {e}")
+                    continue
                 except Exception as e:
-                    log_messages.append(f"Erro ao importar interesse {row['Razão Social']}: {e}")
+                    log_messages.append(f"Erro inesperado na linha {linha_atual}: {e}")
+                    continue
 
+            log_messages.append(f"{interesses_importados} interesses importados com sucesso.")
+            log_messages.append(f"{interesses_duplicados} interesses duplicados foram ignorados.")
             return render(request, self.template_name, {'log_messages': log_messages})
 
         except Exception as e:

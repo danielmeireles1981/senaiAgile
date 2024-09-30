@@ -4,82 +4,138 @@
 <div class="container">
     <h2 class="text-center mb-4">Visualizar Interesse</h2>
     <form>
-    <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Nome:</label>
-        <div class="col-sm-10">
-            <input type="text" readonly class="form-control" value="{{ interesse.razao_social }}">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Nome:</label>
+            <div class="col-sm-10">
+                <input type="text" readonly class="form-control" value="{{ interesse.razao_social }}">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Email:</label>
-        <div class="col-sm-10">
-            <input type="email" readonly class="form-control" value="{{ interesse.email }}">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Email:</label>
+            <div class="col-sm-10">
+                <input type="email" readonly class="form-control" value="{{ interesse.email }}">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Telefone:</label>
-        <div class="col-sm-10">
-            <input type="text" readonly class="form-control" value="{{ interesse.telefone_comercial }}">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Telefone:</label>
+            <div class="col-sm-10">
+                <input type="text" readonly class="form-control" value="{{ interesse.telefone_comercial }}">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Celular:</label>
-        <div class="col-sm-10">
-            <input type="text" readonly class="form-control" value="{{ interesse.celular }}">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Celular:</label>
+            <div class="col-sm-10">
+                <input type="text" readonly class="form-control" value="{{ interesse.celular }}">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Curso:</label>
-        <div class="col-sm-10">
-            <input type="text" readonly class="form-control" value="{{ interesse.curso.nome_curso }}">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Curso:</label>
+            <div class="col-sm-10">
+                <input type="text" readonly class="form-control" value="{{ interesse.curso.nome_curso }}">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Data de Envio:</label>
-        <div class="col-sm-10">
-            <input type="text" readonly class="form-control" value="{{ interesse.data_envio }}">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Data de Envio:</label>
+            <div class="col-sm-10">
+                <input type="text" readonly class="form-control" value="{{ interesse.data_envio }}">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Mensagem:</label>
-        <div class="col-sm-10">
-            <textarea readonly class="form-control" rows="3">{{ interesse.mensagem }}</textarea>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Mensagem:</label>
+            <div class="col-sm-10">
+                <textarea readonly class="form-control" rows="3">{{ interesse.mensagem }}</textarea>
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Realizado Contato:</label>
-        <div class="col-sm-10">
-            <input type="text" readonly class="form-control" value="{{ realizado_contato|upper }}">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Realizado Contato:</label>
+            <div class="col-sm-10">
+                <input type="text" readonly class="form-control" value="{{ realizado_contato|upper }}">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Forma de Contato:</label>
-        <div class="col-sm-10">
-            <input type="text" readonly class="form-control" value="{{ forma_contato }}">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Forma de Contato:</label>
+            <div class="col-sm-10">
+                <input type="text" readonly class="form-control" value="{{ forma_contato }}">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Observações:</label>
-        <div class="col-sm-10">
-            <textarea readonly class="form-control" rows="3">{{ observacoes }}</textarea>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Observações:</label>
+            <div class="col-sm-10">
+                <textarea readonly class="form-control" rows="3">{{ observacoes }}</textarea>
+            </div>
         </div>
-    </div>
 
-    <!-- Exibição do anexo -->
-    <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Evidencia:</label>
-        <div class="col-sm-10">
-            {% if interesse.edicoes.last.arquivo_evidencia %}
-                <a href="{{ interesse.edicoes.last.arquivo_evidencia.url }}" target="_blank" class="btn btn-primary">Ver Anexo</a>
-            {% else %}
-                <p>Nenhum anexo disponível.</p>
-            {% endif %}
+        <!-- Exibição do anexo -->
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Evidência:</label>
+            <div class="col-sm-10">
+                {% if interesse.edicoes.last.arquivo_evidencia %}
+                    <a href="{{ interesse.edicoes.last.arquivo_evidencia.url }}" target="_blank" class="btn btn-primary">Ver Anexo</a>
+                {% else %}
+                    <p>Nenhum anexo disponível.</p>
+                {% endif %}
+            </div>
         </div>
+        <div class="form-footer">
+        <a href="{% url 'listar-dados' %}" class="btn btn-secondary" style="margin-right: 10px;">Voltar</a>
+        <!-- Botão para abrir o modal de atendimentos -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#atendimentosModal">
+            Visualizar Atendimentos
+        </button>
     </div>
-
     </form>
-    <div class="form-footer">
-        <a href="{% url 'listar-dados' %}" class="btn btn-secondary">Voltar</a>
+
+    <!-- Modal para exibir os registros de atendimento -->
+    <div class="modal fade" id="atendimentosModal" tabindex="-1" role="dialog" aria-labelledby="atendimentosModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">  <!-- Aumenta o tamanho do modal -->
+            <div class="modal-content modal-xl">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="atendimentosModalLabel">Registros de Atendimento Anteriores</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="overflow-y: auto; height: 40vh; margin-left: 60px;">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%;">Data e Hora</th>
+                                    <th style="width: 15%;">Realizado Contato</th>
+                                    <th style="width: 15%;">Forma de Contato</th>
+                                    <th style="width: 30%;">Observações</th>
+                                    <th style="width: 20%;">Evidência</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for edicao in interesse.edicoes.all %}
+                                    <tr>
+                                        <td>{{ edicao.data_hora_registro }}</td>
+                                        <td>{{ edicao.realizada_contato|upper }}</td>
+                                        <td>{{ edicao.forma_contato }}</td>
+                                        <td>{{ edicao.observacoes }}</td>
+                                        <td>
+                                            {% if edicao.arquivo_evidencia %}
+                                                <a href="{{ edicao.arquivo_evidencia.url }}" target="_blank" class="btn btn-sm btn-primary">Ver Anexo</a>
+                                            {% else %}
+                                                Nenhum anexo disponível
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">Nenhum atendimento registrado.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

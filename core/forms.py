@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Interesse, Curso, RegistroEdicaoInteresse
 from django.utils import timezone
+from django.forms import modelformset_factory
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(label='Usuário', widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -104,13 +105,28 @@ class EditarInteresseForm(forms.ModelForm):
 
     class Meta:
         model = RegistroEdicaoInteresse
-        fields = ['realizada_contato', 'forma_contato', 'observacoes', 'arquivo_evidencia']  # Incluindo o campo arquivo_evidencia
+        fields = ['realizada_contato', 'forma_contato', 'observacoes', 'arquivo_evidencia']
         widgets = {
             'realizada_contato': forms.Select(choices=RegistroEdicaoInteresse.REALIZADO_CONTATO_CHOICES, attrs={'class': 'form-control'}),
             'observacoes': forms.Textarea(attrs={'class': 'form-control'}),
-            'arquivo_evidencia': forms.FileInput(attrs={'class': 'form-control'})  # Novo widget para upload de arquivo
+            'arquivo_evidencia': forms.FileInput(attrs={'class': 'form-control'})
         }
 
     def __init__(self, *args, **kwargs):
         super(EditarInteresseForm, self).__init__(*args, **kwargs)
         self.fields['realizada_contato'].label = 'Realizado Contato?'
+
+
+# Formulário padrão para RegistroEdicaoInteresse
+class RegistroEdicaoInteresseForm(forms.ModelForm):
+    class Meta:
+        model = RegistroEdicaoInteresse
+        fields = ['realizada_contato', 'forma_contato', 'observacoes', 'arquivo_evidencia']
+
+# Formset para gerenciar múltiplos registros de atendimento
+RegistroEdicaoInteresseFormSet = modelformset_factory(
+    RegistroEdicaoInteresse,
+    form=RegistroEdicaoInteresseForm,
+    extra=1,  # Número de formulários extras vazios
+    can_delete=True  # Permite a exclusão de registros existentes
+)
