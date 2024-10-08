@@ -21,9 +21,9 @@
         <a href="{% url 'cadastrar-interesse' %}" class="btn btn-secondary">Cadastrar Interesse</a>
         <a href="{% url 'cadastrar-curso' %}" class="btn btn-secondary">Cadastrar Curso</a>
         <a href="{% url 'listar-dados' %}" class="btn btn-secondary">Listar Dados</a>
-        <a href="{% url 'relatorios' %}" class="btn btn-secondary">Gráficos</a>
+        <a href="{% url 'relatorios' %}" class="btn btn-secondary">Relatórios</a>
         <a href="{% url 'csv-upload' %}" class="btn btn-secondary">Importar Dados</a>
-        <a href="{% url 'admin' %}" class="btn btn-secondary">Administração</a> <!-- Novo link -->
+        <a href="{% url 'admin' %}" class="btn btn-secondary">Administração</a>
     </div>
     <div class="user-info">
         {% if user.is_authenticated %}
@@ -76,6 +76,15 @@
         <div class="chart-container">
             <canvas id="myChart"></canvas>
         </div>
+
+        <!-- Botão para gerar o PDF -->
+        <form method="get" action="{% url 'gerar-relatorio-pdf' %}" class="mt-4">
+            <input type="hidden" name="data_inicio" value="{{ request.GET.data_inicio }}">
+            <input type="hidden" name="data_fim" value="{{ request.GET.data_fim }}">
+            <input type="hidden" name="curso" value="{{ request.GET.curso }}">
+            <input type="hidden" name="realizado_contato" value="{{ request.GET.realizado_contato }}">
+            <a href="{% url 'gerar-relatorio-pdf' %}?data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}&curso={{ request.GET.curso }}&realizado_contato={{ request.GET.realizado_contato }}" class="btn btn-primary" target="_blank">Gerar PDF</a>
+        </form>
     </div>
 </div>
 

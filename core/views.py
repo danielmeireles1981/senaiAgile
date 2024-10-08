@@ -1,25 +1,32 @@
-import uuid
-import csv
-import chardet  # Biblioteca para detectar codificação
-from django.views.generic import TemplateView, ListView, DetailView, CreateView
-from django.views import View
-from django.utils import timezone  # Certifique-se de importar corretamente
-from django.urls import reverse_lazy
-from django.shortcuts import redirect, render
-from django.db.models import Subquery
-from django.db.models import Exists, OuterRef, Q
-from django.db.models import Count
-from django.db import models
-from django.contrib.auth.views import LoginView as BaseLoginView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import logout
-from django.contrib import messages
+from .forms import LoginForm, InteresseForm, CursoForm, EditarInteresseForm
+from .models import Interesse, Curso
+from .models import RegistroEdicaoInteresse
 from datetime import datetime, time
-from .models import Interesse, Curso, RegistroEdicaoInteresse
-from .forms import LoginForm, InteresseForm, CursoForm, EditarInteresseForm, RegistroEdicaoInteresseFormSet
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView as BaseLoginView
+from django.db import models
+from django.db.models import Count
+from django.db.models import Exists, OuterRef
+from django.db.models import Q
+from django.db.models import Subquery
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.template.loader import get_template
+from django.urls import reverse_lazy
+from django.utils import timezone
+from django.views import View
+from django.views.generic import TemplateView, ListView, DetailView, CreateView
+from io import BytesIO
+from xhtml2pdf import pisa
+import chardet
+import csv
 import logging
-from django.forms import modelformset_factory
-from django.shortcuts import get_object_or_404
+import os
+import uuid
+
 
 # Configure o logger
 logger = logging.getLogger(__name__)
@@ -430,3 +437,49 @@ class CSVUploadView(View):
         except Exception as e:
             log_messages.append(f'Erro ao processar o arquivo: {e}')
             return render(request, self.template_name, {'log_messages': log_messages})
+
+
+
+def gerar_pdf(request):
+    # Obter os filtros da requisição GET
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    curso_id = request.GET.get('curso')
+
+    # Aplicar os filtros
+    interesses = Interesse.objects.all()
+
+    if data_inicio and data_fim:
+        interesses = interesses.filter(data_envio__range=[data_inicio, data_fim])
+
+    if curso_id:
+        interesses = interesses.filter(curso_id=curso_id)
+
+    # Obter o caminho absoluto das imagens
+    logo_caminho = os.path.join(settings.BASE_DIR, 'static', 'images', 'senai-logo.png')
+    rodape_caminho = os.path.join(settings.BASE_DIR, 'static', 'images', 'senai-logo.png')
+
+    # Preparar os dados para o template do PDF
+    template_path = 'core/relatorio_pdf.html'
+    context = {
+        'interesses': interesses,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'curso': Curso.objects.get(id=curso_id) if curso_id else 'Todos',
+        'logo_caminho': logo_caminho,  # Caminho absoluto da imagem
+        'rodape_caminho': rodape_caminho,  # Caminho absoluto da imagem
+    }
+
+    # Renderizar o template com os dados para PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="relatorio.pdf"'
+
+    # Renderizar para PDF usando xhtml2pdf
+    template = get_template(template_path)
+    html = template.render(context)
+    pisa_status = pisa.CreatePDF(BytesIO(html.encode("UTF-8")), dest=response)
+
+    if pisa_status.err:
+        return HttpResponse('Erro ao gerar PDF', status=400)
+
+    return response

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Interesses</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 5px 5px 0px 5px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            padding-bottom: 0px;
+            text-align: center;
+        }
+        td {
+            word-wrap: break-word;
+            word-break: break-all;
+            padding-bottom: 10px;
+            padding-top: 15px;
+        }
+        /* Definir largura específica para a coluna de email */
+        .email-column {
+            width: 230px; /* Ajuste conforme necessário */
+        }
+        .curso-column {
+            width: 170px;
+        }
+        h1{
+            text-align: center;
+            background-color: lightgrey;
+            color: black;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px 0px 0px 0px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Relatório de Interesses</h1>
+    <div class="dados">
+    <p><strong>Data Início:</strong> {{ data_inicio }}</p>
+    <p><strong>Data Fim:</strong> {{ data_fim }}</p>
+    <p><strong>Curso:</strong> {{ curso }}</p>
+    <p><strong>Realizado Contato:</strong> {{ realizado_contato|upper }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Razão Social</th>
+                <th class="email-column">Email</th>
+                <th class="curso-column">Curso</th>
+                <th>Data de Envio</th>
+                <th>Realizado Contato</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for interesse in interesses %}
+            <tr>
+                <td>{{ interesse.razao_social }}</td>
+                <td class="email-column">{{ interesse.email }}</td>
+                <td class="curso-column">{{ interesse.curso.nome_curso }}</td>
+                <td style="text-align: center;">{{ interesse.data_envio|date:"d/m/Y" }}</td>
+                <td style="text-align: center;">{% if interesse.edicoes.last %}{{ interesse.edicoes.last.realizada_contato|upper }}{% else %}NÃO{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
