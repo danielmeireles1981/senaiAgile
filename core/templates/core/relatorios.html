@@ -68,6 +68,7 @@
             </div>
             <button type="submit" class="btn btn-primary">Filtrar</button>
         </form>
+        <a href="{% url 'resultados-testes' %}" class="btn btn-primary">Relatório de Testes Automatizados</a>
     </div>
 
     <!-- Conteúdo principal para o gráfico -->
@@ -83,7 +84,8 @@
             <input type="hidden" name="data_fim" value="{{ request.GET.data_fim }}">
             <input type="hidden" name="curso" value="{{ request.GET.curso }}">
             <input type="hidden" name="realizado_contato" value="{{ request.GET.realizado_contato }}">
-            <a href="{% url 'gerar-relatorio-pdf' %}?data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}&curso={{ request.GET.curso }}&realizado_contato={{ request.GET.realizado_contato }}" class="btn btn-primary" target="_blank">Gerar PDF</a>
+            <a href="{% url 'gerar-relatorio-pdf' %}?data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}&curso={{ request.GET.curso }}&realizado_contato={{ request.GET.realizado_contato }}"
+               class="btn btn-primary" target="_blank">Gerar PDF</a>
         </form>
     </div>
 </div>

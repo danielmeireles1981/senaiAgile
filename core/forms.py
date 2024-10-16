@@ -4,9 +4,11 @@ from .models import Interesse, Curso, RegistroEdicaoInteresse
 from django.utils import timezone
 from django.forms import modelformset_factory
 
+
 class LoginForm(AuthenticationForm):
     username = forms.CharField(label='Usuário', widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label='Senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
 
 class InteresseForm(forms.ModelForm):
     PAGINA_SITE_CHOICES = [
@@ -75,6 +77,7 @@ class InteresseForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
+
 class CursoForm(forms.ModelForm):
     csv_file = forms.FileField(
         required=False,
@@ -89,6 +92,7 @@ class CursoForm(forms.ModelForm):
             'codigo_curso': forms.TextInput(attrs={'class': 'form-control'}),
             'nome_curso': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
 
 class EditarInteresseForm(forms.ModelForm):
     FORMA_CONTATO_CHOICES = [
@@ -107,7 +111,8 @@ class EditarInteresseForm(forms.ModelForm):
         model = RegistroEdicaoInteresse
         fields = ['realizada_contato', 'forma_contato', 'observacoes', 'arquivo_evidencia']
         widgets = {
-            'realizada_contato': forms.Select(choices=RegistroEdicaoInteresse.REALIZADO_CONTATO_CHOICES, attrs={'class': 'form-control'}),
+            'realizada_contato': forms.Select(choices=RegistroEdicaoInteresse.REALIZADO_CONTATO_CHOICES,
+                                              attrs={'class': 'form-control'}),
             'observacoes': forms.Textarea(attrs={'class': 'form-control'}),
             'arquivo_evidencia': forms.FileInput(attrs={'class': 'form-control'})
         }
@@ -122,6 +127,7 @@ class RegistroEdicaoInteresseForm(forms.ModelForm):
     class Meta:
         model = RegistroEdicaoInteresse
         fields = ['realizada_contato', 'forma_contato', 'observacoes', 'arquivo_evidencia']
+
 
 # Formset para gerenciar múltiplos registros de atendimento
 RegistroEdicaoInteresseFormSet = modelformset_factory(

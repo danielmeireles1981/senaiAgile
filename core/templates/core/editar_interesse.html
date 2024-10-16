@@ -1,149 +1,159 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="container">
-    <h2 class="text-center mb-4">Editar Interesse</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
+    <div class="container">
+        <h2 class="text-center mb-4">Editar Interesse</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
 
-        <!-- Exibição dos campos existentes do Interesse para visualização, sem edição -->
-        <fieldset disabled="disabled">
+            <!-- Exibição dos campos existentes do Interesse para visualização, sem edição -->
+            <fieldset disabled="disabled">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="razao_social">Nome:</label>
+                        <input type="text" id="razao_social" class="form-control" value="{{ interesse.razao_social }}">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" class="form-control" value="{{ interesse.email }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="telefone_comercial">Telefone:</label>
+                        <input type="text" id="telefone_comercial" class="form-control"
+                               value="{{ interesse.telefone_comercial }}">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="celular">Celular:</label>
+                        <input type="text" id="celular" class="form-control" value="{{ interesse.celular }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="pagina_site">Origem do Contato:</label>
+                        <input type="url" id="pagina_site" class="form-control" value="{{ interesse.pagina_site }}">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="curso">Curso:</label>
+                        <input type="text" id="curso" class="form-control" value="{{ interesse.curso.nome_curso }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="cidade">Cidade:</label>
+                        <input type="text" id="cidade" class="form-control" value="{{ interesse.cidade }}">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="cnpj">CPF:</label>
+                        <input type="text" id="cnpj" class="form-control" value="{{ interesse.cnpj }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="cep">CEP:</label>
+                        <input type="text" id="cep" class="form-control" value="{{ interesse.cep }}">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="nome_representante">Nome do Representante:</label>
+                        <input type="text" id="nome_representante" class="form-control"
+                               value="{{ interesse.nome_representante }}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="mensagem">Disponibilidade de Turno:</label>
+                    <textarea id="mensagem" class="form-control" rows="3">{{ interesse.mensagem }}</textarea>
+                </div>
+            </fieldset>
+
+            <hr style="border: 3px solid">
+            <!-- Campos editáveis para adicionar informações de atendimento -->
+            <h4 class="mb-3">Adicionar Registro de Atendimento</h4>
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label for="razao_social">Nome:</label>
-                    <input type="text" id="razao_social" class="form-control" value="{{ interesse.razao_social }}">
+                    <label for="numero_atendimento">Número de Atendimento</label>
+                    <input type="text" id="numero_atendimento" class="form-control" value="{{ numero_atendimento }}"
+                           readonly>
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" class="form-control" value="{{ interesse.email }}">
+                    <label for="data_hora_registro">Data e Hora do Registro</label>
+                    <input type="text" id="data_hora_registro" class="form-control" value="{{ data_hora_registro }}"
+                           readonly>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label for="telefone_comercial">Telefone:</label>
-                    <input type="text" id="telefone_comercial" class="form-control" value="{{ interesse.telefone_comercial }}">
+                    <label for="realizada_contato">Realizada Contato</label>
+                    {{ form.realizada_contato }}
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="celular">Celular:</label>
-                    <input type="text" id="celular" class="form-control" value="{{ interesse.celular }}">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="pagina_site">Origem do Contato:</label>
-                    <input type="url" id="pagina_site" class="form-control" value="{{ interesse.pagina_site }}">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="curso">Curso:</label>
-                    <input type="text" id="curso" class="form-control" value="{{ interesse.curso.nome_curso }}">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="cidade">Cidade:</label>
-                    <input type="text" id="cidade" class="form-control" value="{{ interesse.cidade }}">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="cnpj">CPF:</label>
-                    <input type="text" id="cnpj" class="form-control" value="{{ interesse.cnpj }}">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="cep">CEP:</label>
-                    <input type="text" id="cep" class="form-control" value="{{ interesse.cep }}">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="nome_representante">Nome do Representante:</label>
-                    <input type="text" id="nome_representante" class="form-control" value="{{ interesse.nome_representante }}">
+                    <label for="forma_contato">Forma de Contato</label>
+                    {{ form.forma_contato }}
                 </div>
             </div>
             <div class="form-group">
-                <label for="mensagem">Disponibilidade de Turno:</label>
-                <textarea id="mensagem" class="form-control" rows="3">{{ interesse.mensagem }}</textarea>
+                <label for="observacoes">Observações</label>
+                {{ form.observacoes }}
             </div>
-        </fieldset>
-
-        <hr style="border: 3px solid">
-        <!-- Campos editáveis para adicionar informações de atendimento -->
-        <h4 class="mb-3">Adicionar Registro de Atendimento</h4>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="numero_atendimento">Número de Atendimento</label>
-                <input type="text" id="numero_atendimento" class="form-control" value="{{ numero_atendimento }}" readonly>
+            <div class="form-group">
+                <label for="arquivo_evidencia">Envio de Evidência</label>
+                {{ form.arquivo_evidencia }}
             </div>
-            <div class="form-group col-md-6">
-                <label for="data_hora_registro">Data e Hora do Registro</label>
-                <input type="text" id="data_hora_registro" class="form-control" value="{{ data_hora_registro }}" readonly>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="realizada_contato">Realizada Contato</label>
-                {{ form.realizada_contato }}
-            </div>
-            <div class="form-group col-md-6">
-                <label for="forma_contato">Forma de Contato</label>
-                {{ form.forma_contato }}
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="observacoes">Observações</label>
-            {{ form.observacoes }}
-        </div>
-        <div class="form-group">
-            <label for="arquivo_evidencia">Envio de Evidência</label>
-            {{ form.arquivo_evidencia }}
-        </div>
 
 
-        <hr style="border: 3px solid">
+            <hr style="border: 3px solid">
 
-        <!-- Exibição de Registros de Atendimento Anteriores (somente leitura) -->
-        <h4 class="mb-3">Registros de Atendimento Anteriores</h4>
-        <fieldset disabled="disabled">
-            {% for edicao in interesse.edicoes.all %}
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="numero_atendimento_{{ forloop.counter }}">Número de Atendimento</label>
-                        <input type="text" id="numero_atendimento_{{ forloop.counter }}" class="form-control" value="{{ edicao.numero_atendimento }}">
+            <!-- Exibição de Registros de Atendimento Anteriores (somente leitura) -->
+            <h4 class="mb-3">Registros de Atendimento Anteriores</h4>
+            <fieldset disabled="disabled">
+                {% for edicao in interesse.edicoes.all %}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="numero_atendimento_{{ forloop.counter }}">Número de Atendimento</label>
+                            <input type="text" id="numero_atendimento_{{ forloop.counter }}" class="form-control"
+                                   value="{{ edicao.numero_atendimento }}">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="data_hora_registro_{{ forloop.counter }}">Data e Hora do Registro</label>
+                            <input type="text" id="data_hora_registro_{{ forloop.counter }}" class="form-control"
+                                   value="{{ edicao.data_hora_registro }}">
+                        </div>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="data_hora_registro_{{ forloop.counter }}">Data e Hora do Registro</label>
-                        <input type="text" id="data_hora_registro_{{ forloop.counter }}" class="form-control" value="{{ edicao.data_hora_registro }}">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="realizada_contato_{{ forloop.counter }}">Realizada Contato</label>
+                            <input type="text" id="realizada_contato_{{ forloop.counter }}" class="form-control"
+                                   value="{{ edicao.realizada_contato }}">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="forma_contato_{{ forloop.counter }}">Forma de Contato</label>
+                            <input type="text" id="forma_contato_{{ forloop.counter }}" class="form-control"
+                                   value="{{ edicao.forma_contato }}">
+                        </div>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="realizada_contato_{{ forloop.counter }}">Realizada Contato</label>
-                        <input type="text" id="realizada_contato_{{ forloop.counter }}" class="form-control" value="{{ edicao.realizada_contato }}">
+                    <div class="form-group">
+                        <label for="observacoes_{{ forloop.counter }}">Observações</label>
+                        <textarea id="observacoes_{{ forloop.counter }}" class="form-control"
+                                  rows="3">{{ edicao.observacoes }}</textarea>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="forma_contato_{{ forloop.counter }}">Forma de Contato</label>
-                        <input type="text" id="forma_contato_{{ forloop.counter }}" class="form-control" value="{{ edicao.forma_contato }}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="observacoes_{{ forloop.counter }}">Observações</label>
-                    <textarea id="observacoes_{{ forloop.counter }}" class="form-control" rows="3">{{ edicao.observacoes }}</textarea>
-                </div>
 
-                <div class="form-group">
-                    <label for="arquivo_evidencia_{{ forloop.counter }}">Envio de Evidência</label>
-                    {% if edicao.arquivo_evidencia %}
-                        <a href="{{ edicao.arquivo_evidencia.url }}" class="btn btn-primary" target="_blank">Ver Evidência</a>
-                    {% else %}
-                        <p>Nenhuma evidência disponível.</p>
-                    {% endif %}
-                </div>
-                <hr/>
-            {% endfor %}
-        </fieldset>
+                    <div class="form-group">
+                        <label for="arquivo_evidencia_{{ forloop.counter }}">Envio de Evidência</label>
+                        {% if edicao.arquivo_evidencia %}
+                            <a href="{{ edicao.arquivo_evidencia.url }}" class="btn btn-primary" target="_blank">Ver
+                                Evidência</a>
+                        {% else %}
+                            <p>Nenhuma evidência disponível.</p>
+                        {% endif %}
+                    </div>
+                    <hr/>
+                {% endfor %}
+            </fieldset>
 
-        <div class="form-footer">
-            <button type="submit" class="btn btn-primary" style="margin-right: 10px">Salvar Alterações</button>
-            <a href="{% url 'listar-dados' %}" class="btn btn-secondary">Cancelar</a>
-        </div>
-    </form>
-</div>
+            <div class="form-footer">
+                <button type="submit" class="btn btn-primary" style="margin-right: 10px">Salvar Alterações</button>
+                <a href="{% url 'listar-dados' %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
 {% endblock %}

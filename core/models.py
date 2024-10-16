@@ -2,12 +2,14 @@ from django.db import models
 import uuid
 from django.utils import timezone  # Importação necessária para usar a data e hora atual
 
+
 class Curso(models.Model):
     codigo_curso = models.CharField(max_length=10, unique=True)
     nome_curso = models.CharField(max_length=100)
 
     def __str__(self):
         return self.nome_curso
+
 
 class Interesse(models.Model):
     razao_social = models.CharField(max_length=100, default='Razão Social Padrão')
@@ -26,8 +28,10 @@ class Interesse(models.Model):
     @property
     def codigo_curso(self):
         return self.curso.codigo_curso
+
     def __str__(self):
         return self.nome_representante
+
 
 class RegistroEdicaoInteresse(models.Model):
     REALIZADO_CONTATO_CHOICES = [
@@ -42,7 +46,7 @@ class RegistroEdicaoInteresse(models.Model):
     observacoes = models.TextField()
     editado_em = models.DateTimeField(auto_now_add=True)
     usuario = models.CharField(max_length=150)  # Novo campo para armazenar o nome do usuário
-    arquivo_evidencia = models.FileField ( upload_to='evidencias/', blank=True, null=True )
+    arquivo_evidencia = models.FileField(upload_to='evidencias/', blank=True, null=True)
 
     def __str__(self):
         return f'Edição de {self.interesse.nome_representante} em {self.editado_em}'

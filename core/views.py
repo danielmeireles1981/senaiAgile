@@ -26,14 +26,16 @@ import csv
 import logging
 import os
 import uuid
-
+from .utils import gerar_pdf_resultados_testes, executar_testes
 
 # Configure o logger
 logger = logging.getLogger(__name__)
 
+
 class LoginView(BaseLoginView):
     form_class = LoginForm
     template_name = 'core/login.html'
+
 
 class InteresseCreateView(LoginRequiredMixin, CreateView):
     model = Interesse
@@ -128,7 +130,8 @@ class CursoCreateView(LoginRequiredMixin, View):
                         cursos_ignorados += 1
                         logger.warning(f"Curso {nome_curso} já existe, ignorado.")
 
-                messages.success(self.request, f"{cursos_criados} cursos criados com sucesso, {cursos_ignorados} cursos ignorados.")
+                messages.success(self.request,
+                                 f"{cursos_criados} cursos criados com sucesso, {cursos_ignorados} cursos ignorados.")
                 return redirect(self.success_url)
 
             except csv.Error as e:
@@ -216,16 +219,15 @@ class ListarDadosView(LoginRequiredMixin, ListView):
         return context
 
 
-
-class VisualizarInteresseView ( LoginRequiredMixin, DetailView ):
+class VisualizarInteresseView(LoginRequiredMixin, DetailView):
     model = Interesse
     template_name = 'core/visualizar_interesse.html'
     context_object_name = 'interesse'
 
     def get_context_data(self, **kwargs):
-        context = super ().get_context_data ( **kwargs )
-        ultimo_registro = RegistroEdicaoInteresse.objects.filter ( interesse=self.object ).order_by (
-            '-data_hora_registro' ).first ()
+        context = super().get_context_data(**kwargs)
+        ultimo_registro = RegistroEdicaoInteresse.objects.filter(interesse=self.object).order_by(
+            '-data_hora_registro').first()
 
         context['realizado_contato'] = ultimo_registro.realizada_contato if ultimo_registro else 'Não'
         context['forma_contato'] = ultimo_registro.forma_contato if ultimo_registro else 'N/A'
@@ -439,7 +441,6 @@ class CSVUploadView(View):
             return render(request, self.template_name, {'log_messages': log_messages})
 
 
-
 def gerar_pdf(request):
     # Obter os filtros da requisição GET
     data_inicio = request.GET.get('data_inicio')
@@ -483,3 +484,14 @@ def gerar_pdf(request):
         return HttpResponse('Erro ao gerar PDF', status=400)
 
     return response
+
+
+def exibir_resultados_testes(request):
+    # Executar os testes e capturar os resultados
+    resultados = executar_testes()
+    print(resultados)
+
+    # Renderizar os resultados na página
+    return render(request, 'core/resultados_testes.html', {
+        'resultados': resultados
+    })
