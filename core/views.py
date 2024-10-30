@@ -96,6 +96,7 @@ class CursoCreateView(LoginRequiredMixin, View):
         # Verifica se um arquivo CSV foi enviado
         csv_file = request.FILES.get('csv_file')
         if csv_file:
+            # Lógica para importar cursos via CSV
             try:
                 # Detecta a codificação do arquivo
                 raw_data = csv_file.read()
@@ -144,8 +145,16 @@ class CursoCreateView(LoginRequiredMixin, View):
                 messages.error(self.request, f"Erro desconhecido durante a importação: {e}")
                 return redirect(self.success_url)
 
-        messages.error(self.request, "Por favor, selecione um arquivo CSV.")
-        return redirect(self.success_url)
+        else:
+            # Lógica para criação manual de cursos
+            form = CursoForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(self.request, "Curso criado com sucesso!")
+                return redirect(self.success_url)
+            else:
+                messages.error(self.request, "Erro ao criar o curso. Verifique os dados informados.")
+                return render(request, self.template_name, {'form': form})
 
 
 class HomeView(LoginRequiredMixin, TemplateView):
