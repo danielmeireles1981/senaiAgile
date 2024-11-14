@@ -87,6 +87,17 @@ DATABASES = {
     }
 }
 
+#DATABASES = {
+#    'default': {
+ #       'ENGINE': 'django.db.backends.mysql',
+    #    'NAME': 'senaiagile',
+  #      'USER': 'devmysql',
+   #     'PASSWORD': 'Ti@80123',
+   #     'HOST': '10.90.235.163',
+   #     'PORT': '3306',
+#    }
+#}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

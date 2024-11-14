@@ -410,6 +410,19 @@ class CSVUploadView(View):
                     ).exists()
 
                     if not interesse_exists:
+                        # Converter data_envio se presente no CSV
+                        data_envio_raw = row.get('Data Envio', '').strip()
+                        data_envio = timezone.now()  # Usa data atual como padrão
+
+                        if data_envio_raw:
+                            try:
+                                # Converte para timezone-aware usando o novo formato
+                                data_envio = timezone.make_aware(datetime.strptime(data_envio_raw, "%d/%m/%Y %H:%M"))
+                                logger.info(f"Data de envio '{data_envio_raw}' convertida com sucesso.")
+                            except ValueError as ve:
+                                logger.warning(f"Formato de data inválido para '{data_envio_raw}'. Erro: {ve}")
+                                data_envio = timezone.now()
+
                         # Criar novo interesse
                         Interesse.objects.create(
                             razao_social=row['Razão Social'],
@@ -422,7 +435,7 @@ class CSVUploadView(View):
                             cep=row.get('CEP', ''),
                             cidade=row['Cidade'],
                             mensagem=row.get('Mensagem', ''),
-                            data_envio=datetime.now(),  # Adicionando a data e hora atual
+                            data_envio=data_envio,
                             curso=curso
                         )
                         interesses_importados += 1
