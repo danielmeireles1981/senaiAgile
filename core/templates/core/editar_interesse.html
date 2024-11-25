@@ -64,42 +64,58 @@
                     <label for="mensagem">Disponibilidade de Turno:</label>
                     <textarea id="mensagem" class="form-control" rows="3">{{ interesse.mensagem }}</textarea>
                 </div>
+
             </fieldset>
 
             <hr style="border: 3px solid">
-            <!-- Campos editáveis para adicionar informações de atendimento -->
-            <h4 class="mb-3">Adicionar Registro de Atendimento</h4>
+
+            <!-- Status e motivo de inativação -->
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label for="numero_atendimento">Número de Atendimento</label>
-                    <input type="text" id="numero_atendimento" class="form-control" value="{{ numero_atendimento }}"
-                           readonly>
+                    <label style="margin-right: 8%" for="ativo">Status:</label>
+                    {{ form.ativo }}
+                    <small class="form-text text-muted">Marque para inativar o registro.</small>
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="data_hora_registro">Data e Hora do Registro</label>
-                    <input type="text" id="data_hora_registro" class="form-control" value="{{ data_hora_registro }}"
-                           readonly>
+                    <label for="motivo_inativacao" id="motivo_inativacao">Motivo da Inativação:</label>
+                    {{ form.motivo_inativacao }}
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="realizada_contato">Realizada Contato</label>
-                    {{ form.realizada_contato }}
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="forma_contato">Forma de Contato</label>
-                    {{ form.forma_contato }}
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="observacoes">Observações</label>
-                {{ form.observacoes }}
-            </div>
-            <div class="form-group">
-                <label for="arquivo_evidencia">Envio de Evidência</label>
-                {{ form.arquivo_evidencia }}
             </div>
 
+            <!-- Adicionar Registro -->
+            <div id="registro-container">
+                <h4 class="mb-3">Adicionar Registro de Atendimento</h4>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="numero_atendimento">Número de Atendimento</label>
+                        <input type="text" id="numero_atendimento" class="form-control" value="{{ numero_atendimento }}"
+                               readonly>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="data_hora_registro">Data e Hora do Registro</label>
+                        <input type="text" id="data_hora_registro" class="form-control" value="{{ data_hora_registro }}"
+                               readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="realizada_contato">Realizada Contato</label>
+                        {{ form.realizada_contato }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="forma_contato">Forma de Contato</label>
+                        {{ form.forma_contato }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="observacoes">Observações</label>
+                    {{ form.observacoes }}
+                </div>
+                <div class="form-group">
+                    <label for="arquivo_evidencia">Envio de Evidência</label>
+                    {{ form.arquivo_evidencia }}
+                </div>
+            </div>
 
             <hr style="border: 3px solid">
 
@@ -156,4 +172,31 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusCheckbox = document.getElementById('status-checkbox');
+            const registroContainer = document.getElementById('registro-container');
+            const motivoInativacao = document.getElementById('id_motivo_inativacao'); // Certifique-se do ID correto.
+
+            function toggleFields() {
+                const disableRegistro = statusCheckbox.checked;
+                const disableMotivo = !statusCheckbox.checked;
+
+                // Desabilitar/Ativar os campos de registro
+                registroContainer.querySelectorAll('input, select, textarea').forEach(field => {
+                    field.disabled = disableRegistro;
+                });
+
+                // Desabilitar/Ativar o campo motivo da inativação
+                motivoInativacao.disabled = disableMotivo;
+            }
+
+            // Inicializar o estado
+            toggleFields();
+
+            // Adicionar listener ao checkbox
+            statusCheckbox.addEventListener('change', toggleFields);
+        });
+    </script>
 {% endblock %}

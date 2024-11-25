@@ -256,32 +256,38 @@ class EditarInteresseView(LoginRequiredMixin, CreateView):
             interesse_id = self.kwargs.get('pk')
             interesse = Interesse.objects.get(id=interesse_id)
 
-            # Log dos dados recebidos no formulário
-            logger.info(f"Dados do formulário de edição recebidos: {form.cleaned_data}")
+            # Atualizar o status ativo/inativo e o motivo
+            interesse.ativo = form.cleaned_data.get('ativo', True)
+            interesse.motivo_inativacao = form.cleaned_data.get('motivo_inativacao', '') if not interesse.ativo else ''
+            interesse.save()
 
-            # Criar um novo registro de atendimento
+            # Criar registro apenas se o registro for ativo
             registro = form.save(commit=False)
             registro.interesse = interesse
-            registro.numero_atendimento = uuid.uuid4()  # Gerar número de atendimento
-            registro.usuario = self.request.user.username  # Adiciona o nome do usuário logado
-            registro.data_hora_registro = timezone.now()  # Adicionar data/hora do registro
 
-            # Verificar se um arquivo foi enviado e associar ao registro
-            if 'arquivo_evidencia' in form.files:
-                registro.arquivo_evidencia = form.files['arquivo_evidencia']
+            if interesse.ativo:
+                registro.numero_atendimento = uuid.uuid4()
+                registro.usuario = self.request.user.username
+                registro.data_hora_registro = timezone.now()
 
-            registro.save()
-            messages.success(self.request, "Atendimento registrado com sucesso.")
+                if 'arquivo_evidencia' in form.files:
+                    registro.arquivo_evidencia = form.files['arquivo_evidencia']
+
+                registro.save()
+            else:
+                # Salvar apenas o interesse como inativo, sem criar um novo registro de atendimento
+                messages.success(self.request, "Registro inativado com sucesso.")
+                return redirect(self.success_url)
+
+            messages.success(self.request, "Registro atualizado com sucesso.")
             return super().form_valid(form)
 
         except Exception as e:
-            # Captura qualquer erro que ocorrer durante o processo e registra no log
             logger.error(f"Erro ao salvar o registro de atendimento: {e}")
             messages.error(self.request, "Erro ao atualizar interesse. Verifique os dados e tente novamente.")
             return self.form_invalid(form)
 
     def form_invalid(self, form):
-        # Registrar os erros do formulário para análise
         logger.warning(f"Formulário inválido: {form.errors}")
         messages.error(self.request, "Erro ao atualizar interesse. Verifique os dados e tente novamente.")
         return super().form_invalid(form)
@@ -290,10 +296,9 @@ class EditarInteresseView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         interesse_id = self.kwargs.get('pk')
         context['interesse'] = Interesse.objects.get(id=interesse_id)
-        context['numero_atendimento'] = uuid.uuid4()  # Gera um novo número de atendimento para exibição
-        context['data_hora_registro'] = timezone.now()  # Data/hora atual para exibição
+        context['numero_atendimento'] = uuid.uuid4()
+        context['data_hora_registro'] = timezone.now()
         return context
-
 
 class RelatoriosView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):

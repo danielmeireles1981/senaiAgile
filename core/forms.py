@@ -104,12 +104,32 @@ class EditarInteresseForm(forms.ModelForm):
     forma_contato = forms.ChoiceField(
         choices=FORMA_CONTATO_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'}),
-        label="Forma de Contato"
+        label="Forma de Contato",
+        required=False  # Permite que este campo seja opcional
+    )
+
+    motivo_inativacao = forms.ChoiceField(
+        choices=[
+            ('desistencia', 'Desistência'),
+            ('matriculado', 'Já Matriculado'),
+            ('concluiu', 'Já Fez o Curso'),
+            ('nao_interesse', 'Não Tem Interesse'),
+            ('outros', 'Outros'),
+        ],
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label="Motivo da Inativação"
+    )
+
+    ativo = forms.BooleanField(
+        required=False,
+        label="Ativo",
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input', 'id': 'status-checkbox'})
     )
 
     class Meta:
         model = RegistroEdicaoInteresse
-        fields = ['realizada_contato', 'forma_contato', 'observacoes', 'arquivo_evidencia']
+        fields = ['realizada_contato', 'forma_contato', 'observacoes', 'arquivo_evidencia', 'ativo', 'motivo_inativacao']
         widgets = {
             'realizada_contato': forms.Select(choices=RegistroEdicaoInteresse.REALIZADO_CONTATO_CHOICES,
                                               attrs={'class': 'form-control'}),
@@ -117,10 +137,17 @@ class EditarInteresseForm(forms.ModelForm):
             'arquivo_evidencia': forms.FileInput(attrs={'class': 'form-control'})
         }
 
-    def __init__(self, *args, **kwargs):
-        super(EditarInteresseForm, self).__init__(*args, **kwargs)
-        self.fields['realizada_contato'].label = 'Realizado Contato?'
+    def clean(self):
+        cleaned_data = super().clean()
+        ativo = cleaned_data.get('ativo', True)
 
+        if not ativo:
+            # Definir valores padrão para campos obrigatórios quando inativo
+            cleaned_data['realizada_contato'] = 'inativo'
+            cleaned_data['forma_contato'] = 'N/A'  # Definir valor padrão para forma de contato
+            cleaned_data['observacoes'] = cleaned_data.get('observacoes', '') or 'Registro inativado.'
+
+        return cleaned_data
 
 # Formulário padrão para RegistroEdicaoInteresse
 class RegistroEdicaoInteresseForm(forms.ModelForm):
