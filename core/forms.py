@@ -99,13 +99,15 @@ class EditarInteresseForm(forms.ModelForm):
         ('telefone', 'Telefone'),
         ('whatsapp', 'Whatsapp'),
         ('email', 'Email'),
+        ('outros', 'Outros'),
+        ('inativo', 'Inativo')
     ]
 
     forma_contato = forms.ChoiceField(
         choices=FORMA_CONTATO_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'}),
         label="Forma de Contato",
-        required=False  # Permite que este campo seja opcional
+        required=False
     )
 
     motivo_inativacao = forms.ChoiceField(
@@ -140,12 +142,10 @@ class EditarInteresseForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         ativo = cleaned_data.get('ativo', True)
+        motivo_inativacao = cleaned_data.get('motivo_inativacao', '')
 
-        if not ativo:
-            # Definir valores padrão para campos obrigatórios quando inativo
-            cleaned_data['realizada_contato'] = 'inativo'
-            cleaned_data['forma_contato'] = 'N/A'  # Definir valor padrão para forma de contato
-            cleaned_data['observacoes'] = cleaned_data.get('observacoes', '') or 'Registro inativado.'
+        if not ativo and motivo_inativacao:
+            cleaned_data['realizada_contato'] = 'sim'  # Finaliza o atendimento
 
         return cleaned_data
 

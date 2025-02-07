@@ -11,6 +11,7 @@
             <input type="file" name="csv_file" id="csv_file" class="form-control-file" style="margin: 20px 0; padding: 10px;">
         </div>
         <button type="submit" class="btn btn-primary">Importar</button>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 
     {% if log_messages %}

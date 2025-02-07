@@ -165,10 +165,9 @@ class ListarDadosView(LoginRequiredMixin, ListView):
     model = Interesse
     template_name = 'core/listar_dados.html'
     context_object_name = 'interesses'
-    paginate_by = 5  # Define 5 registros por página
+    paginate_by = 10  # Define 5 registros por página
 
     def get_queryset(self):
-        # Inicializando o queryset
         queryset = super().get_queryset()
 
         # Subquery para obter o status mais recente de "realizado_contato" para cada Interesse
@@ -186,8 +185,8 @@ class ListarDadosView(LoginRequiredMixin, ListView):
 
         if data_inicio and data_fim:
             try:
-                data_inicio = datetime.combine(datetime.strptime(data_inicio, "%Y-%m-%d").date(), time.min)
-                data_fim = datetime.combine(datetime.strptime(data_fim, "%Y-%m-%d").date(), time.max)
+                data_inicio = datetime.strptime(data_inicio, "%Y-%m-%d").date()
+                data_fim = datetime.strptime(data_fim, "%Y-%m-%d").date()
                 queryset = queryset.filter(data_envio__range=[data_inicio, data_fim])
             except Exception as e:
                 logger.error(f"Erro ao processar as datas: {e}")
@@ -198,7 +197,7 @@ class ListarDadosView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(curso__id=curso)
 
         # Filtro por realizado_contato
-        realizado_contato = self.request.GET.get('realizado_contato', 'nao')  # Padrão é 'não'
+        realizado_contato = self.request.GET.get('realizado_contato', 'nao')
 
         if realizado_contato == 'nao':
             queryset = queryset.filter(
@@ -206,6 +205,13 @@ class ListarDadosView(LoginRequiredMixin, ListView):
             )
         elif realizado_contato:
             queryset = queryset.filter(realizado_contato__iexact=realizado_contato)
+
+        # **Novo filtro: Status Ativo/Inativo**
+        status = self.request.GET.get('status')
+        if status == 'inativo':
+            queryset = queryset.filter(ativo=False)
+        elif status == 'ativo':
+            queryset = queryset.filter(ativo=True)
 
         # Substituindo valores 'None' por 'NÃO' para o campo realizado_contato
         for interesse in queryset:
@@ -219,11 +225,12 @@ class ListarDadosView(LoginRequiredMixin, ListView):
         context['cursos'] = Curso.objects.all().order_by('nome_curso')
         context['realizado_contato_choices'] = RegistroEdicaoInteresse.REALIZADO_CONTATO_CHOICES
 
-        # Definir 'realizado_contato' como 'nao' no contexto, caso não tenha sido enviado
-        if not self.request.GET.get('realizado_contato'):
-            context['selected_realizado_contato'] = 'nao'
-        else:
-            context['selected_realizado_contato'] = self.request.GET.get('realizado_contato')
+        # **Passando os filtros para manter na URL**
+        context['selected_data_inicio'] = self.request.GET.get('data_inicio', '')
+        context['selected_data_fim'] = self.request.GET.get('data_fim', '')
+        context['selected_curso'] = self.request.GET.get('curso', '')
+        context['selected_realizado_contato'] = self.request.GET.get('realizado_contato', 'nao')
+        context['selected_status'] = self.request.GET.get('status', '')
 
         return context
 
@@ -235,12 +242,38 @@ class VisualizarInteresseView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ultimo_registro = RegistroEdicaoInteresse.objects.filter(interesse=self.object).order_by(
+        interesse = self.object  # O interesse sendo visualizado
+
+        ultimo_registro = RegistroEdicaoInteresse.objects.filter(interesse=interesse).order_by(
             '-data_hora_registro').first()
 
         context['realizado_contato'] = ultimo_registro.realizada_contato if ultimo_registro else 'Não'
         context['forma_contato'] = ultimo_registro.forma_contato if ultimo_registro else 'N/A'
         context['observacoes'] = ultimo_registro.observacoes if ultimo_registro else 'Nenhuma observação'
+
+        # Passar informações de inativação
+        context['is_inativo'] = not interesse.ativo
+        context['motivo_inativacao'] = interesse.motivo_inativacao if not interesse.ativo else None
+
+        # 🔹 Conversão do campo "Período Desejado"
+        PERIODOS_MAPA = {
+            'manha': 'Manhã',
+            'tarde': 'Tarde',
+            'noite': 'Noite',
+            'sabadomanha': 'Sábado Manhã',
+            'sabadotarde': 'Sábado Tarde'
+        }
+
+        # Obtém os períodos desejados armazenados
+        periodos_raw = interesse.mensagem
+
+        # Converte lista ou string formatada para exibição
+        if isinstance(periodos_raw, list):  # Se já for lista
+            periodos_legiveis = [PERIODOS_MAPA.get(p, p) for p in periodos_raw]
+        else:  # Se for string, tratar para lista
+            periodos_legiveis = [PERIODOS_MAPA.get(p.strip(), p.strip()) for p in periodos_raw.strip("[]").replace("'", "").split(",")]
+
+        context['periodo_legivel'] = ", ".join(periodos_legiveis)  # Junta os valores formatados
 
         return context
 
@@ -256,28 +289,28 @@ class EditarInteresseView(LoginRequiredMixin, CreateView):
             interesse_id = self.kwargs.get('pk')
             interesse = Interesse.objects.get(id=interesse_id)
 
-            # Atualizar o status ativo/inativo e o motivo
-            interesse.ativo = form.cleaned_data.get('ativo', True)
-            interesse.motivo_inativacao = form.cleaned_data.get('motivo_inativacao', '') if not interesse.ativo else ''
+            # Se o checkbox foi marcado e o usuário escolheu um motivo de inativação, apenas ao salvar:
+            if form.cleaned_data.get('ativo') is False and form.cleaned_data.get('motivo_inativacao'):
+                interesse.ativo = False
+                interesse.motivo_inativacao = form.cleaned_data['motivo_inativacao']
+                form.instance.realizada_contato = 'sim'  # Marca o atendimento como realizado
+            else:
+                interesse.ativo = True
+                interesse.motivo_inativacao = ''
+
             interesse.save()
 
-            # Criar registro apenas se o registro for ativo
+            # Criar o novo registro no histórico de edições
             registro = form.save(commit=False)
             registro.interesse = interesse
+            registro.usuario = self.request.user.username
+            registro.numero_atendimento = uuid.uuid4()
+            registro.data_hora_registro = timezone.now()
 
-            if interesse.ativo:
-                registro.numero_atendimento = uuid.uuid4()
-                registro.usuario = self.request.user.username
-                registro.data_hora_registro = timezone.now()
+            if 'arquivo_evidencia' in form.files:
+                registro.arquivo_evidencia = form.files['arquivo_evidencia']
 
-                if 'arquivo_evidencia' in form.files:
-                    registro.arquivo_evidencia = form.files['arquivo_evidencia']
-
-                registro.save()
-            else:
-                # Salvar apenas o interesse como inativo, sem criar um novo registro de atendimento
-                messages.success(self.request, "Registro inativado com sucesso.")
-                return redirect(self.success_url)
+            registro.save()
 
             messages.success(self.request, "Registro atualizado com sucesso.")
             return super().form_valid(form)
@@ -286,11 +319,6 @@ class EditarInteresseView(LoginRequiredMixin, CreateView):
             logger.error(f"Erro ao salvar o registro de atendimento: {e}")
             messages.error(self.request, "Erro ao atualizar interesse. Verifique os dados e tente novamente.")
             return self.form_invalid(form)
-
-    def form_invalid(self, form):
-        logger.warning(f"Formulário inválido: {form.errors}")
-        messages.error(self.request, "Erro ao atualizar interesse. Verifique os dados e tente novamente.")
-        return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -302,47 +330,45 @@ class EditarInteresseView(LoginRequiredMixin, CreateView):
 
 class RelatoriosView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        # Aplicar filtros
         interesses = Interesse.objects.all()
 
-        # Filtro de data
+        # Capturar os filtros da URL
         data_inicio = request.GET.get('data_inicio')
         data_fim = request.GET.get('data_fim')
+        curso_id = request.GET.get('curso')
+        realizado_contato = request.GET.get('realizado_contato')
 
+        # Filtrar por data
         if data_inicio and data_fim:
             try:
-                data_inicio = datetime.combine(datetime.strptime(data_inicio, "%Y-%m-%d").date(), time.min)
-                data_fim = datetime.combine(datetime.strptime(data_fim, "%Y-%m-%d").date(), time.max)
+                data_inicio = datetime.strptime(data_inicio, "%Y-%m-%d").date()
+                data_fim = datetime.strptime(data_fim, "%Y-%m-%d").date()
                 interesses = interesses.filter(data_envio__range=[data_inicio, data_fim])
-            except Exception as e:
-                print(f"Erro ao processar as datas: {e}")
+            except ValueError:
+                messages.error(request, "Formato de data inválido.")
 
-        # Filtro de curso
-        curso_id = request.GET.get('curso')
+        # Filtrar por curso
         if curso_id:
             interesses = interesses.filter(curso_id=curso_id)
 
-        # Filtro de realizado_contato
-        realizado_contato = request.GET.get('realizado_contato')
+        # Filtrar por status do contato
         if realizado_contato:
-            if realizado_contato == 'nao':
-                interesses = interesses.annotate(
-                    contato_existe=Exists(
-                        RegistroEdicaoInteresse.objects.filter(
-                            interesse_id=OuterRef('pk'),
-                            realizada_contato='sim'
-                        )
-                    )
-                ).filter(Q(contato_existe=False) | Q(contato_existe=None))
-            else:
-                interesses = interesses.annotate(
-                    contato_existe=Exists(
-                        RegistroEdicaoInteresse.objects.filter(
-                            interesse_id=OuterRef('pk'),
-                            realizada_contato='sim'
-                        )
-                    )
-                ).filter(contato_existe=True)
+            if realizado_contato == "sim":
+                interesses = interesses.filter(
+                    Exists(RegistroEdicaoInteresse.objects.filter(
+                        interesse_id=OuterRef('pk'),
+                        realizada_contato="sim"
+                    ))
+                )
+            elif realizado_contato == "nao":
+                interesses = interesses.exclude(
+                    Exists(RegistroEdicaoInteresse.objects.filter(
+                        interesse_id=OuterRef('pk'),
+                        realizada_contato="sim"
+                    ))
+                )
+            elif realizado_contato == "inativo":
+                interesses = interesses.filter(ativo=False)
 
         # Contagem de interesses por curso
         interesses_por_curso = interesses.values('curso__nome_curso').annotate(total=Count('id')).order_by('-total')
@@ -350,18 +376,19 @@ class RelatoriosView(LoginRequiredMixin, View):
         cursos = [item['curso__nome_curso'] for item in interesses_por_curso]
         totais = [item['total'] for item in interesses_por_curso]
 
-        # Obter a lista de cursos e valores de realizado_contato para o formulário
         context = {
             'cursos': Curso.objects.all().order_by('nome_curso'),
             'realizado_contato_choices': [
                 ('sim', 'Sim'),
-                ('nao', 'Não')
+                ('nao', 'Não'),
+                ('inativo', 'Inativo')
             ],
-            'labels': cursos,  # Labels dos cursos para o gráfico
-            'data': totais  # Dados dos totais para o gráfico
+            'labels': cursos,
+            'data': totais
         }
 
         return render(request, 'core/relatorios.html', context)
+
 
 
 class LogoutView(LoginRequiredMixin, View):

@@ -173,30 +173,52 @@
         </form>
     </div>
 
+
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const statusCheckbox = document.getElementById('status-checkbox');
-            const registroContainer = document.getElementById('registro-container');
-            const motivoInativacao = document.getElementById('id_motivo_inativacao'); // Certifique-se do ID correto.
+            const realizadaContatoField = document.getElementById('id_realizada_contato');
+            const motivoInativacao = document.getElementById('id_motivo_inativacao');
+            const formaContatoField = document.getElementById('id_forma_contato');
+            const observacoesField = document.getElementById('id_observacoes');
 
             function toggleFields() {
-                const disableRegistro = statusCheckbox.checked;
-                const disableMotivo = !statusCheckbox.checked;
+                if (statusCheckbox.checked) {
+                    motivoInativacao.disabled = false; // Habilita o campo
+                } else {
+                    motivoInativacao.disabled = true;  // Desabilita se não estiver inativo
+                    motivoInativacao.value = '';       // Limpa o campo
+                }
 
-                // Desabilitar/Ativar os campos de registro
-                registroContainer.querySelectorAll('input, select, textarea').forEach(field => {
-                    field.disabled = disableRegistro;
-                });
-
-                // Desabilitar/Ativar o campo motivo da inativação
-                motivoInativacao.disabled = disableMotivo;
+                // Caso a inativação esteja preenchida e marcada, bloqueia os outros campos
+                if (statusCheckbox.checked && motivoInativacao.value) {
+                    realizadaContatoField.value = 'sim';
+                    realizadaContatoField.disabled = true;
+                    formaContatoField.disabled = true;
+                    formaContatoField.value = 'inativo';
+                    observacoesField.disabled = true;
+                    observacoesField.placeholder = 'O registro foi inativado.';
+                } else {
+                    realizadaContatoField.disabled = false;
+                    formaContatoField.disabled = false;
+                    formaContatoField.value = '';
+                    observacoesField.disabled = false;
+                    observacoesField.placeholder = '';
+                }
             }
 
-            // Inicializar o estado
-            toggleFields();
+            // Não salva automaticamente no banco ao clicar no checkbox
+            statusCheckbox.addEventListener('change', function () {
+                toggleFields();
+            });
 
-            // Adicionar listener ao checkbox
-            statusCheckbox.addEventListener('change', toggleFields);
+            motivoInativacao.addEventListener('change', toggleFields);
+
+            // Inicializa os campos no carregamento da página
+            toggleFields();
         });
     </script>
+
+
 {% endblock %}

@@ -39,37 +39,62 @@
 
     <form method="get" class="mb-4">
         <div class="form-row">
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 <label for="data_inicio">Data Início:</label>
-                <input type="date" name="data_inicio" id="data_inicio" class="form-control">
+                <input type="date" name="data_inicio" id="data_inicio" class="form-control"
+                       value="{{ selected_data_inicio }}">
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 <label for="data_fim">Data Fim:</label>
-                <input type="date" name="data_fim" id="data_fim" class="form-control">
+                <input type="date" name="data_fim" id="data_fim" class="form-control"
+                       value="{{ selected_data_fim }}">
             </div>
             <div class="form-group col-md-3">
                 <label for="curso">Curso:</label>
                 <select name="curso" id="curso" class="form-control">
                     <option value="">Todos os Cursos</option>
                     {% for curso in cursos %}
-                        <option value="{{ curso.id }}">{{ curso.nome_curso }}</option>
+                        <option value="{{ curso.id }}"
+                                {% if selected_curso == curso.id|stringformat:"s" %}selected{% endif %}>
+                            {{ curso.nome_curso }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 <label for="realizado_contato">Realizado Contato:</label>
                 <select name="realizado_contato" id="realizado_contato" class="form-control">
                     <option value="">Todos</option>
                     {% for valor, texto in realizado_contato_choices %}
-                        <option value="{{ valor }}">{{ texto }}</option>
+                        <option value="{{ valor }}" {% if selected_realizado_contato == valor %}selected{% endif %}>
+                            {{ texto }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
+
+            <!-- **Novo filtro de Status Ativo/Inativo** -->
+            <div class="form-group col-md-2">
+                <label for="status">Status:</label>
+                <select name="status" id="status" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="ativo" {% if selected_status == "ativo" %}selected{% endif %}>Ativo</option>
+                    <option value="inativo" {% if selected_status == "inativo" %}selected{% endif %}>Inativo</option>
+                </select>
+
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary px-4 py-2"
+                        style="margin: 25px 21px 20px 22px; font-size: 20px;">
+                    Filtrar
+                </button>
+            </div>
+
         </div>
-        <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary" style="padding: 10px 50px;">Filtrar</button>
-        </div>
+
+
     </form>
+
 
     <!-- Paginação -->
     {% if is_paginated %}
@@ -123,31 +148,38 @@
                     <th>Celular</th>
                     <th>Curso</th>
                     <th>Data</th>
-                    <th style="width: 5%">Contato</th>
-                    <th style="width: 10%">Ações</th>
+                    <th>Status</th>
+                    <th>Contato</th>
+                    <th>Ações</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for interesse in interesses %}
-                    <tr>
+                    <tr {% if not interesse.ativo %}class="table-danger"{% endif %}>
                         <td>{{ interesse.razao_social }}</td>
                         <td>{{ interesse.email }}</td>
                         <td>{{ interesse.celular }}</td>
                         <td>{{ interesse.curso.nome_curso }}</td>
                         <td>{{ interesse.data_envio|date:"d/m/Y" }}</td>
+                        <td>{% if interesse.ativo %}<span class="text-success">Ativo</span>{% else %}
+                            <span class="text-danger">Inativo</span>{% endif %}
+                        </td>
                         <td class="{% if interesse.realizado_contato == 'sim' %}text-success{% else %}text-danger{% endif %}">
                             {{ interesse.realizado_contato|upper }}
                         </td>
                         <td>
-                            <a href="{% url 'visualizar-interesse' interesse.pk %}"
-                               class="btn btn-info btn-sm btn-custom2">Visualizar</a>
-                            <a href="{% url 'editar-interesse' interesse.pk %}"
-                               class="btn btn-warning btn-sm btn-custom1">Editar</a>
+                            <a href="{% url 'editar-interesse' interesse.pk %}" class="btn btn-warning btn-md">Editar</a>
+                            {% if interesse.ativo %}
+                                <a href="{% url 'visualizar-interesse' interesse.pk %}" class="btn btn-info btn-md">Visualizar</a>
+                            {% else %}
+                                <button class="btn btn-secondary btn-sm" disabled>Inativo</button>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
+
         </div>
 
 

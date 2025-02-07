@@ -124,6 +124,16 @@ header {
     border-color: #cc0000;
 }
 
+.btn-warning {
+    background-color: #e67700;
+    border-color: #e67700;
+}
+
+.btn-warning:hover {
+    background-color: #e67700;
+    border-color: #e67700;
+}
+
 .btn-secondary {
     background-color: #333;
     border-color: #333;

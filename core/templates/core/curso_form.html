@@ -16,6 +16,7 @@
             {{ form.nome_curso }}
         </div>
         <button type="submit" class="btn btn-primary">Salvar Curso</button>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 
     <hr/>
@@ -29,6 +30,7 @@
             <input type="file" name="csv_file" id="csv_file" class="form-control">
         </div>
         <button type="submit" class="btn btn-primary">Importar CSV</button>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}

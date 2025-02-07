@@ -58,17 +58,20 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="realizado_contato">Realizado Contato:</label>
+                <label for="realizado_contato">Status do Contato:</label>
                 <select name="realizado_contato" id="realizado_contato" class="form-control">
-                    <option value="">Todos</option>
-                    {% for valor, texto in realizado_contato_choices %}
-                        <option value="{{ valor }}">{{ texto }}</option>
-                    {% endfor %}
+                    <option value="" {% if not request.GET.realizado_contato %}selected{% endif %}>Todos</option>
+                    <option value="sim" {% if request.GET.realizado_contato == 'sim' %}selected{% endif %}>Sim</option>
+                    <option value="nao" {% if request.GET.realizado_contato == 'nao' %}selected{% endif %}>Não</option>
+                    <option value="inativo" {% if request.GET.realizado_contato == 'inativo' %}selected{% endif %}>
+                        Inativo
+                    </option>
                 </select>
             </div>
+
             <button type="submit" class="btn btn-primary">Filtrar</button>
         </form>
-        <a href="{% url 'resultados-testes' %}" class="btn btn-primary">Relatório de Testes Automatizados</a>
+
     </div>
 
     <!-- Conteúdo principal para o gráfico -->
