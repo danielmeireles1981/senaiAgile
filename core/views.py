@@ -27,6 +27,8 @@ import logging
 import os
 import uuid
 from .utils import gerar_pdf_resultados_testes, executar_testes
+from django.utils.http import urlencode
+
 
 # Configure o logger
 logger = logging.getLogger(__name__)
@@ -165,7 +167,7 @@ class ListarDadosView(LoginRequiredMixin, ListView):
     model = Interesse
     template_name = 'core/listar_dados.html'
     context_object_name = 'interesses'
-    paginate_by = 10  # Define 5 registros por página
+    paginate_by = 10  # Define 10 registros por página
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -179,59 +181,56 @@ class ListarDadosView(LoginRequiredMixin, ListView):
             realizado_contato=Subquery(latest_edicao.values('realizada_contato')[:1])
         ).order_by('data_envio')
 
-        # Filtros existentes de data
+        # Substituir valores None por "Não"
+        for interesse in queryset:
+            if interesse.realizado_contato is None:
+                interesse.realizado_contato = "Não"
+
+        # Filtros existentes
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
+        curso = self.request.GET.get('curso')
+        realizado_contato = self.request.GET.get('realizado_contato')
+        status = self.request.GET.get('status', 'todos')
 
         if data_inicio and data_fim:
-            try:
-                data_inicio = datetime.strptime(data_inicio, "%Y-%m-%d").date()
-                data_fim = datetime.strptime(data_fim, "%Y-%m-%d").date()
-                queryset = queryset.filter(data_envio__range=[data_inicio, data_fim])
-            except Exception as e:
-                logger.error(f"Erro ao processar as datas: {e}")
+            queryset = queryset.filter(data_envio__range=[data_inicio, data_fim])
 
-        # Filtro por curso
-        curso = self.request.GET.get('curso')
         if curso:
             queryset = queryset.filter(curso__id=curso)
 
-        # Filtro por realizado_contato
-        realizado_contato = self.request.GET.get('realizado_contato', 'nao')
-
         if realizado_contato == 'nao':
-            queryset = queryset.filter(
-                models.Q(realizado_contato__iexact='nao') | models.Q(realizado_contato__isnull=True)
-            )
+            queryset = queryset.filter(realizado_contato__isnull=True)
         elif realizado_contato:
-            queryset = queryset.filter(realizado_contato__iexact=realizado_contato)
+            queryset = queryset.filter(realizado_contato=realizado_contato)
 
-        # **Novo filtro: Status Ativo/Inativo**
-        status = self.request.GET.get('status')
-        if status == 'inativo':
-            queryset = queryset.filter(ativo=False)
-        elif status == 'ativo':
+        if status == "ativo":
             queryset = queryset.filter(ativo=True)
-
-        # Substituindo valores 'None' por 'NÃO' para o campo realizado_contato
-        for interesse in queryset:
-            if interesse.realizado_contato is None:
-                interesse.realizado_contato = 'não'
+        elif status == "inativo":
+            queryset = queryset.filter(ativo=False)
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['cursos'] = Curso.objects.all().order_by('nome_curso')
-        context['realizado_contato_choices'] = RegistroEdicaoInteresse.REALIZADO_CONTATO_CHOICES
 
-        # **Passando os filtros para manter na URL**
-        context['selected_data_inicio'] = self.request.GET.get('data_inicio', '')
-        context['selected_data_fim'] = self.request.GET.get('data_fim', '')
-        context['selected_curso'] = self.request.GET.get('curso', '')
-        context['selected_realizado_contato'] = self.request.GET.get('realizado_contato', 'nao')
-        context['selected_status'] = self.request.GET.get('status', '')
+        # Captura os filtros da URL para manter na paginação
+        query_params = self.request.GET.dict()
+        query_params.pop("page", None)  # Remove a página para evitar duplicação
+        context['query_string'] = urlencode(query_params)
 
+        context.update({
+            'cursos': Curso.objects.all().order_by('nome_curso'),
+            'realizado_contato_choices': [
+                ('sim', 'Sim'),
+                ('nao', 'Não')
+            ],
+            'selected_data_inicio': self.request.GET.get('data_inicio', ''),
+            'selected_data_fim': self.request.GET.get('data_fim', ''),
+            'selected_curso': self.request.GET.get('curso', ''),
+            'selected_realizado_contato': self.request.GET.get('realizado_contato', 'nao'),
+            'selected_status': self.request.GET.get('status', 'todos'),
+        })
         return context
 
 
@@ -289,26 +288,30 @@ class EditarInteresseView(LoginRequiredMixin, CreateView):
             interesse_id = self.kwargs.get('pk')
             interesse = Interesse.objects.get(id=interesse_id)
 
-            # Se o checkbox foi marcado e o usuário escolheu um motivo de inativação, apenas ao salvar:
-            if form.cleaned_data.get('ativo') is False and form.cleaned_data.get('motivo_inativacao'):
+            # Captura os valores do formulário
+            ativo = self.request.POST.get('ativo', 'true') == "false"  # 🔹 Converte corretamente para booleano
+            motivo_inativacao = form.cleaned_data.get('motivo_inativacao', '')
+
+            # **Correção: Atualizar corretamente o campo ativo**
+            if not ativo and motivo_inativacao:
                 interesse.ativo = False
-                interesse.motivo_inativacao = form.cleaned_data['motivo_inativacao']
-                form.instance.realizada_contato = 'sim'  # Marca o atendimento como realizado
+                interesse.motivo_inativacao = motivo_inativacao
             else:
                 interesse.ativo = True
                 interesse.motivo_inativacao = ''
 
-            interesse.save()
+            interesse.save(update_fields=['ativo', 'motivo_inativacao'])  # 🔹 Atualiza o banco de dados corretamente
 
-            # Criar o novo registro no histórico de edições
+            # Criar um novo registro no histórico de edições
             registro = form.save(commit=False)
             registro.interesse = interesse
             registro.usuario = self.request.user.username
             registro.numero_atendimento = uuid.uuid4()
             registro.data_hora_registro = timezone.now()
 
-            if 'arquivo_evidencia' in form.files:
-                registro.arquivo_evidencia = form.files['arquivo_evidencia']
+            # Se houver arquivo evidência, salvar
+            if 'arquivo_evidencia' in self.request.FILES:
+                registro.arquivo_evidencia = self.request.FILES['arquivo_evidencia']
 
             registro.save()
 
@@ -327,6 +330,8 @@ class EditarInteresseView(LoginRequiredMixin, CreateView):
         context['numero_atendimento'] = uuid.uuid4()
         context['data_hora_registro'] = timezone.now()
         return context
+
+
 
 class RelatoriosView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):

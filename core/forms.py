@@ -123,15 +123,9 @@ class EditarInteresseForm(forms.ModelForm):
         label="Motivo da Inativação"
     )
 
-    ativo = forms.BooleanField(
-        required=False,
-        label="Ativo",
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input', 'id': 'status-checkbox'})
-    )
-
     class Meta:
         model = RegistroEdicaoInteresse
-        fields = ['realizada_contato', 'forma_contato', 'observacoes', 'arquivo_evidencia', 'ativo', 'motivo_inativacao']
+        fields = ['realizada_contato', 'forma_contato', 'observacoes', 'arquivo_evidencia', 'motivo_inativacao']
         widgets = {
             'realizada_contato': forms.Select(choices=RegistroEdicaoInteresse.REALIZADO_CONTATO_CHOICES,
                                               attrs={'class': 'form-control'}),
@@ -139,15 +133,6 @@ class EditarInteresseForm(forms.ModelForm):
             'arquivo_evidencia': forms.FileInput(attrs={'class': 'form-control'})
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        ativo = cleaned_data.get('ativo', True)
-        motivo_inativacao = cleaned_data.get('motivo_inativacao', '')
-
-        if not ativo and motivo_inativacao:
-            cleaned_data['realizada_contato'] = 'sim'  # Finaliza o atendimento
-
-        return cleaned_data
 
 # Formulário padrão para RegistroEdicaoInteresse
 class RegistroEdicaoInteresseForm(forms.ModelForm):

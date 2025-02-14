@@ -35,7 +35,13 @@
             width: 230px; /* Ajuste conforme necessário */
         }
         .curso-column {
-            width: 170px;
+            width: 150px;
+        }
+        .nome-column {
+            width: 120px;
+        }
+        .telefone-column {
+            width: 90px;
         }
         h1{
             text-align: center;
@@ -60,8 +66,9 @@
     <table>
         <thead>
             <tr>
-                <th>Razão Social</th>
+                <th class="nome-column">Razão Social</th>
                 <th class="email-column">Email</th>
+                <th class="telefone-column">Telefone</th>
                 <th class="curso-column">Curso</th>
                 <th>Data de Envio</th>
                 <th>Realizado Contato</th>
@@ -72,6 +79,7 @@
             <tr>
                 <td>{{ interesse.razao_social }}</td>
                 <td class="email-column">{{ interesse.email }}</td>
+                <td class="telefone-column">{{ interesse.celular }}</td>
                 <td class="curso-column">{{ interesse.curso.nome_curso }}</td>
                 <td style="text-align: center;">{{ interesse.data_envio|date:"d/m/Y" }}</td>
                 <td style="text-align: center;">{% if interesse.edicoes.last %}{{ interesse.edicoes.last.realizada_contato|upper }}{% else %}NÃO{% endif %}</td>

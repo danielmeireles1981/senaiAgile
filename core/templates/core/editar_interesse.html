@@ -72,10 +72,15 @@
             <!-- Status e motivo de inativação -->
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label style="margin-right: 8%" for="ativo">Status:</label>
-                    {{ form.ativo }}
+                    <label for="status-checkbox">Status:</label>
+                    <!-- Campo oculto para garantir envio de False quando desmarcado -->
+                    <input type="hidden" name="ativo" value="false">
+                    <input type="checkbox" name="ativo" id="status-checkbox" value="true">
+
                     <small class="form-text text-muted">Marque para inativar o registro.</small>
                 </div>
+
+
                 <div class="form-group col-md-6">
                     <label for="motivo_inativacao" id="motivo_inativacao">Motivo da Inativação:</label>
                     {{ form.motivo_inativacao }}
@@ -185,13 +190,13 @@
 
             function toggleFields() {
                 if (statusCheckbox.checked) {
-                    motivoInativacao.disabled = false; // Habilita o campo
+                    motivoInativacao.disabled = false; // Habilita o campo de motivo de inativação
                 } else {
-                    motivoInativacao.disabled = true;  // Desabilita se não estiver inativo
-                    motivoInativacao.value = '';       // Limpa o campo
+                    motivoInativacao.disabled = true;  // Desabilita e limpa o campo se não estiver inativo
+                    motivoInativacao.value = '';
                 }
 
-                // Caso a inativação esteja preenchida e marcada, bloqueia os outros campos
+                // Se o registro for inativado e tiver motivo, bloquear os outros campos
                 if (statusCheckbox.checked && motivoInativacao.value) {
                     realizadaContatoField.value = 'sim';
                     realizadaContatoField.disabled = true;
@@ -208,16 +213,20 @@
                 }
             }
 
-            // Não salva automaticamente no banco ao clicar no checkbox
-            statusCheckbox.addEventListener('change', function () {
-                toggleFields();
+            // Antes de enviar, garantir que os valores corretos sejam enviados
+            document.querySelector('form').addEventListener('submit', function () {
+                document.querySelector('input[name="ativo"]').value = statusCheckbox.checked ? "true" : "false"; // Converte para string correta
+                motivoInativacao.disabled = false; // Ativa antes do envio para que o valor seja salvo corretamente
             });
-
+            // Listener para ativar ou desativar campos conforme necessário
+            statusCheckbox.addEventListener('change', toggleFields);
             motivoInativacao.addEventListener('change', toggleFields);
 
             // Inicializa os campos no carregamento da página
             toggleFields();
         });
+
+
     </script>
 
 
