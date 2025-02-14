@@ -168,12 +168,12 @@
                             {{ interesse.realizado_contato|upper }}
                         </td>
                         <td>
-                            <a href="{% url 'editar-interesse' interesse.pk %}" class="btn btn-warning btn-md">Editar</a>
                             {% if interesse.ativo %}
-                                <a href="{% url 'visualizar-interesse' interesse.pk %}" class="btn btn-info btn-md">Visualizar</a>
+                                <a href="{% url 'editar-interesse' interesse.pk %}" class="btn btn-warning btn-md">Editar</a>
                             {% else %}
-                                <button class="btn btn-secondary btn-sm" disabled>Inativo</button>
+                                <button class="btn btn-secondary btn-md" disabled>Inativo</button>
                             {% endif %}
+                                <a href="{% url 'visualizar-interesse' interesse.pk %}" class="btn btn-info btn-md">Visualizar</a>
                         </td>
                     </tr>
                 {% endfor %}
