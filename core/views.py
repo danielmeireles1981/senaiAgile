@@ -7,11 +7,8 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as BaseLoginView
-from django.db import models
 from django.db.models import Count
-from django.db.models import Exists, OuterRef
-from django.db.models import Q
-from django.db.models import Subquery
+from django.db.models import Exists
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import get_template
@@ -21,17 +18,16 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, CreateView
 from io import BytesIO
 from xhtml2pdf import pisa
+from .utils import gerar_pdf_resultados_testes, executar_testes
+from django.http import JsonResponse
+from django.contrib.auth.views import PasswordChangeView
+from django.utils.http import urlencode
+from django.db.models import OuterRef, Subquery, Q
 import chardet
 import csv
 import logging
 import os
 import uuid
-from .utils import gerar_pdf_resultados_testes, executar_testes
-from django.utils.http import urlencode
-from django.http import JsonResponse
-from django.contrib.auth.views import PasswordChangeView
-from django.utils.http import urlencode
-from django.db.models import OuterRef, Subquery, Q
 
 
 # Configure o logger
