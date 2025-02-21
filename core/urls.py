@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from .views import (
     LoginView, InteresseCreateView, CursoCreateView, HomeView,
     ListarDadosView, RelatoriosView, LogoutView, VisualizarInteresseView,
-    EditarInteresseView, CSVUploadView, gerar_pdf, exibir_resultados_testes
+    EditarInteresseView, CSVUploadView, gerar_pdf, exibir_resultados_testes, PesquisarInteresseView, AlterarSenhaView,
 )
 
 urlpatterns = [
@@ -20,4 +20,7 @@ urlpatterns = [
     path('admin/', auth_views.LoginView.as_view(), name='admin'),
     path('relatorios/gerar-pdf/', gerar_pdf, name='gerar-relatorio-pdf'),
     path('testes/', exibir_resultados_testes, name='resultados-testes'),
+    path('pesquisar-interesse/', PesquisarInteresseView.as_view(), name='pesquisar-interesse'),
+    path('alterar-senha/', AlterarSenhaView.as_view(), name='alterar-senha'),
+
 ]

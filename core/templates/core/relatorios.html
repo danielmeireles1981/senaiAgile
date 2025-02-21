@@ -4,7 +4,7 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatórios - SENAI Agile</title>
+    <title>Relatórios - SENAI.Agile</title>
     <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
 <header class="d-flex justify-content-between align-items-center">
     <div class="logo-container">
         <img src="{% static 'images/senai-logo.png' %}" alt="Logo" class="logo-img">
-        <h1 class="logo">SENAI Agile</h1>
+        <h1 class="logo">SENAI.Agile</h1>
     </div>
     <div class="navigation">
         <a href="{% url 'home' %}" class="btn btn-secondary">Home</a>
@@ -28,10 +28,22 @@
     </div>
     <div class="user-info">
         {% if user.is_authenticated %}
-            <span class="user-name">Olá, {{ user.username }}</span>
-            <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 16px; margin-right: 10px; background-color: #e60000; color: white; border-color: #e60000;">
+                    Olá, {{ user.username }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li><a class="dropdown-item" href="{% url 'alterar-senha' %}">Alterar Senha</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a></li>
+                </ul>
+            </div>
+
         {% else %}
-            <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+            <a href="{% url 'login' %}" class="btn btn-primary" style="font-size: 16px; margin-right: 10px; background-color: #e60000; color: white; border-color: #e60000;">Login</a>
         {% endif %}
     </div>
 </header>
@@ -106,5 +118,14 @@
     var data = {{ data|safe }};
 </script>
 <script src="{% static 'js/relatorio.js' %}"></script> <!-- Referência ao script -->
+<!-- ✅ Versão correta do jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- ✅ Popper.js (Necessário para dropdowns no Bootstrap) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+
+<!-- ✅ Bootstrap (Versão 5) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

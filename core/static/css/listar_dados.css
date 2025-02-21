@@ -11,6 +11,13 @@ html, body {
     background-position: center;
 }
 
+body {
+    zoom: 90%;
+    -moz-transform: scale(0.9); /* Para Firefox */
+    -moz-transform-origin: top center;
+}
+
+
 .list-dados-fullwidth {
     width: 100%;
     padding: 20px;

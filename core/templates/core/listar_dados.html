@@ -4,7 +4,7 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listar Dados - SENAI Agile</title>
+    <title>Listar Dados - SENAI.Agile</title>
     <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 <header class="d-flex justify-content-between align-items-center">
     <div class="logo-container">
         <img src="{% static 'images/senai-logo.png' %}" alt="Logo" class="logo-img">
-        <h1 class="logo">SENAI Agile</h1>
+        <h1 class="logo">SENAI.Agile</h1>
     </div>
     <div class="navigation">
         <a href="{% url 'home' %}" class="btn btn-secondary">Home</a>
@@ -27,10 +27,22 @@
     </div>
     <div class="user-info">
         {% if user.is_authenticated %}
-            <span class="user-name">Olá, {{ user.username }}</span>
-            <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 16px; margin-right: 10px; background-color: #e60000; color: white; border-color: #e60000;">
+                    Olá, {{ user.username }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li><a class="dropdown-item" href="{% url 'alterar-senha' %}">Alterar Senha</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a></li>
+                </ul>
+            </div>
+
         {% else %}
-            <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+            <a href="{% url 'login' %}" class="btn btn-primary" style="font-size: 16px; margin-right: 10px; background-color: #e60000; color: white; border-color: #e60000;">Login</a>
         {% endif %}
     </div>
 </header>
@@ -50,7 +62,7 @@
                 <input type="date" name="data_fim" id="data_fim" class="form-control"
                        value="{{ selected_data_fim }}">
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-4">
                 <label for="curso">Curso:</label>
                 <select name="curso" id="curso" class="form-control">
                     <option value="">Todos os Cursos</option>
@@ -83,15 +95,31 @@
                     <option value="inativo" {% if selected_status == "inativo" %}selected{% endif %}>Inativo</option>
                 </select>
             </div>
+            <!-- Campo de Pesquisa por Nome -->
+            <div class="form-group col-md-5">
+                <label for="nome_pesquisa">Nome:</label>
+                <input type="text" name="nome" id="nome_pesquisa" class="form-control"
+                       placeholder="Digite um nome..." value="{{ selected_nome }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="telefone">Celular:</label>
+                <input type="text" name="telefone" id="telefone" class="form-control telefone-mask"
+                       value="{{ selected_telefone }}" placeholder="(XX) XXXXX-XXXX">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="email">E-mail:</label>
+                <input type="text" name="email" id="email" class="form-control"
+                       value="{{ selected_email }}" placeholder="Digite um e-mail...">
+            </div>
 
-<div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary px-4 py-2"
-                    style="margin: 25px 21px 20px 22px; font-size: 20px;">
-                Filtrar
-            </button>
-        </div>
-        </div>
 
+            <div class="justify-content-end" style="margin-top: 25px; margin-left: 30px;">
+                <button type="submit" class="btn btn-primary px-4 py-2"
+                        style="font-size: 20px;">
+                    Filtrar
+                </button>
+            </div>
+        </div>
 
 
     </form>
@@ -113,6 +141,10 @@
                         <li class="page-item">
                             <a class="page-link"
                                href="?page=
+
+
+
+
                                        {{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}"
                                aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
@@ -137,6 +169,10 @@
                         <li class="page-item">
                             <a class="page-link"
                                href="?page=
+
+
+
+
                                        {{ page_obj.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}"
                                aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
@@ -145,6 +181,10 @@
                         <li class="page-item">
                             <a class="page-link"
                                href="?page=
+
+
+
+
                                        {{ page_obj.paginator.num_pages }}{% if query_string %}&{{ query_string }}{% endif %}"
                                aria-label="Last">
                                 <span aria-hidden="true">&raquo;&raquo;</span>
@@ -222,8 +262,41 @@
     </div>
 </footer>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- ✅ Versão correta do jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- ✅ Popper.js (Necessário para dropdowns no Bootstrap) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+
+<!-- ✅ Bootstrap (Versão 5) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function aplicarMascaraTelefone(input) {
+            input.addEventListener("input", function () {
+                let value = input.value.replace(/\D/g, ""); // Remove tudo que não for número
+
+                if (value.length > 11) {
+                    value = value.slice(0, 11); // Limita a 11 dígitos (exemplo: 11999998888)
+                }
+
+                if (value.length > 6) {
+                    input.value = `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7)}`;
+                } else if (value.length > 2) {
+                    input.value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+                } else if (value.length > 0) {
+                    input.value = `(${value}`;
+                } else {
+                    input.value = "";
+                }
+            });
+        }
+
+        // Aplica a máscara nos campos com a classe 'telefone-mask'
+        document.querySelectorAll(".telefone-mask").forEach(aplicarMascaraTelefone);
+    });
+</script>
+
 </body>
 </html>

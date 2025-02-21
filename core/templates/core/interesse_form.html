@@ -8,14 +8,24 @@
 
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    {{ form.razao_social.label_tag }}
-                    {{ form.razao_social }}
+                    <label for="id_razao_social">Nome:</label>
+                    <div class="input-group">
+                        {{ form.razao_social }}
+                        <div class="input-group-append">
+                            <button type="button" class="btn" id="pesquisarNomeBtn">
+                                🔍
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group col-md-6">
                     {{ form.email.label_tag }}
                     {{ form.email }}
                 </div>
+
+
             </div>
+
 
             <!-- Continue com os campos existentes -->
             <div class="form-row">
@@ -86,4 +96,86 @@
             </div>
         </form>
     </div>
+
+    <!-- Modal de Pesquisa -->
+    <div class="modal fade" id="resultadoPesquisaModal" tabindex="-1" role="dialog"
+         aria-labelledby="resultadoPesquisaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document"> <!-- Adicionado modal-xl para aumentar o tamanho -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resultadoPesquisaModalLabel">Resultados da Pesquisa</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Curso</th>
+                            <th>Data do Registro</th>
+                            <th>Telefone</th>
+                            <th>Email</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabelaResultados">
+                        <!-- Resultados serão inseridos aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const pesquisarNomeBtn = document.getElementById("pesquisarNomeBtn");
+            const nomeInput = document.getElementById("id_razao_social");
+
+            pesquisarNomeBtn.addEventListener("click", function () {
+                let nomePesquisa = nomeInput.value.trim();
+
+                if (nomePesquisa.length < 3) {
+                    alert("Digite pelo menos 3 letras para pesquisar.");
+                    return;
+                }
+
+                // Requisição AJAX para buscar os dados
+                fetch(`/pesquisar-interesse/?nome=${encodeURIComponent(nomePesquisa)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let tabelaResultados = document.getElementById("tabelaResultados");
+                        tabelaResultados.innerHTML = ""; // Limpa resultados anteriores
+
+                        if (data.length === 0) {
+                            tabelaResultados.innerHTML = "<tr><td colspan='5' class='text-center'>Nenhum registro encontrado.</td></tr>";
+                        } else {
+                            data.forEach(interesse => {
+                                let row = `
+                                <tr>
+                                    <td>${interesse.nome}</td>
+                                    <td>${interesse.curso}</td>
+                                    <td>${interesse.data_registro}</td>
+                                    <td>${interesse.telefone}</td>
+                                    <td>${interesse.email}</td>
+                                </tr>
+                            `;
+                                tabelaResultados.innerHTML += row;
+                            });
+                        }
+
+                        // Exibe o modal com os resultados
+                        $("#resultadoPesquisaModal").modal("show");
+                    })
+                    .catch(error => {
+                        console.error("Erro ao buscar dados:", error);
+                        alert("Erro ao buscar registros.");
+                    });
+            });
+        });
+    </script>
+
+
 {% endblock %}

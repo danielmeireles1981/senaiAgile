@@ -9,6 +9,13 @@ body {
     min-height: 100vh;
 }
 
+body {
+    zoom: 90%;
+    -moz-transform: scale(0.9); /* Para Firefox */
+    -moz-transform-origin: top center;
+}
+
+
 header {
     background-color: #333;
     color: #fff;

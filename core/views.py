@@ -28,15 +28,30 @@ import os
 import uuid
 from .utils import gerar_pdf_resultados_testes, executar_testes
 from django.utils.http import urlencode
+from django.http import JsonResponse
+from django.contrib.auth.views import PasswordChangeView
+from django.utils.http import urlencode
+from django.db.models import OuterRef, Subquery, Q
 
 
 # Configure o logger
 logger = logging.getLogger(__name__)
 
-
 class LoginView(BaseLoginView):
     form_class = LoginForm
     template_name = 'core/login.html'
+
+class AlterarSenhaView(PasswordChangeView):
+    template_name = 'core/alterar_senha.html'
+    success_url = reverse_lazy('home')  # Redireciona para home após a alteração bem-sucedida
+
+    def form_valid(self, form):
+        messages.success(self.request, "Senha alterada com sucesso!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Erro ao alterar a senha. Verifique os dados informados.")
+        return super().form_invalid(form)
 
 
 class InteresseCreateView(LoginRequiredMixin, CreateView):
@@ -163,6 +178,8 @@ class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'core/home.html'
 
 
+
+
 class ListarDadosView(LoginRequiredMixin, ListView):
     model = Interesse
     template_name = 'core/listar_dados.html'
@@ -172,7 +189,7 @@ class ListarDadosView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        # Subquery para obter o status mais recente de "realizado_contato" para cada Interesse
+        # Subquery para obter o status mais recente de "realizado_contato"
         latest_edicao = RegistroEdicaoInteresse.objects.filter(
             interesse_id=OuterRef('pk')
         ).order_by('-data_hora_registro')
@@ -186,12 +203,17 @@ class ListarDadosView(LoginRequiredMixin, ListView):
             if interesse.realizado_contato is None:
                 interesse.realizado_contato = "Não"
 
-        # Filtros existentes
+        # 🔎 **Filtros**
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
         curso = self.request.GET.get('curso')
         realizado_contato = self.request.GET.get('realizado_contato')
         status = self.request.GET.get('status', 'todos')
+
+        # **Novos Filtros**
+        nome_pesquisa = self.request.GET.get('nome', '').strip()
+        telefone_pesquisa = self.request.GET.get('telefone', '').strip()
+        email_pesquisa = self.request.GET.get('email', '').strip()
 
         if data_inicio and data_fim:
             queryset = queryset.filter(data_envio__range=[data_inicio, data_fim])
@@ -208,6 +230,19 @@ class ListarDadosView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(ativo=True)
         elif status == "inativo":
             queryset = queryset.filter(ativo=False)
+
+        # **🔍 Filtros de Nome, Telefone e Email**
+        if nome_pesquisa:
+            queryset = queryset.filter(
+                razao_social__istartswith=nome_pesquisa)  # 🔹 Agora busca apenas pelo início do nome
+
+        if telefone_pesquisa:
+            queryset = queryset.filter(Q(telefone_comercial__istartswith=telefone_pesquisa) |
+                                       Q(celular__istartswith=telefone_pesquisa))  # 🔹 Permite busca por telefone comercial ou celular
+
+        if email_pesquisa:
+            queryset = queryset.filter(
+                email__istartswith=email_pesquisa)  # 🔹 Busca emails que começam com o texto digitado
 
         return queryset
 
@@ -230,6 +265,10 @@ class ListarDadosView(LoginRequiredMixin, ListView):
             'selected_curso': self.request.GET.get('curso', ''),
             'selected_realizado_contato': self.request.GET.get('realizado_contato', 'nao'),
             'selected_status': self.request.GET.get('status', 'todos'),
+            'selected_nome': self.request.GET.get('nome', ''),  # 🔹 Mantém o nome digitado no campo de pesquisa
+            'selected_telefone': self.request.GET.get('telefone', ''),
+            # 🔹 Mantém o telefone digitado no campo de pesquisa
+            'selected_email': self.request.GET.get('email', ''),  # 🔹 Mantém o email digitado no campo de pesquisa
         })
         return context
 
@@ -554,3 +593,31 @@ def exibir_resultados_testes(request):
     return render(request, 'core/resultados_testes.html', {
         'resultados': resultados
     })
+
+
+
+class PesquisarInteresseView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        nome = request.GET.get('nome', '').strip()
+
+        if len(nome) < 3:
+            return JsonResponse([], safe=False)  # Retorna lista vazia
+
+        # Busca os interesses no banco que tenham o nome similar
+        interesses = Interesse.objects.filter(razao_social__icontains=nome).values(
+            'razao_social', 'curso__nome_curso', 'data_envio', 'telefone_comercial', 'email'
+        )[:10]  # Limita para 10 resultados
+
+        # Converte os dados para um formato mais legível no JSON
+        dados_formatados = [
+            {
+                "nome": interesse["razao_social"],
+                "curso": interesse["curso__nome_curso"],
+                "data_registro": interesse["data_envio"].strftime("%d/%m/%Y"),
+                "telefone": interesse["telefone_comercial"],
+                "email": interesse["email"]
+            }
+            for interesse in interesses
+        ]
+
+        return JsonResponse(dados_formatados, safe=False)

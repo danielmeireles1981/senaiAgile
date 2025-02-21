@@ -12,6 +12,13 @@ html, body {
 
 }
 
+body {
+    zoom: 90%;
+    -moz-transform: scale(0.9); /* Para Firefox */
+    -moz-transform-origin: top center;
+}
+
+
 .container {
     margin-top: 10px;
     flex: 1; /* Ensures content takes up remaining space */
@@ -273,6 +280,30 @@ input[type="file"] {
 input[type="date"] {
     font-family: 'Montserrat', sans-serif;
 }
+
+#id_razao_social {
+    width: 89%; !important;/* Garante que ocupe toda a largura disponível dentro do input-group */
+}
+
+.input-group {
+    display: flex;
+    align-items: center; /* Alinha os itens verticalmente */
+}
+
+.input-group .form-control {
+    flex: 1; /* Faz o campo ocupar o máximo de espaço disponível */
+}
+
+.input-group-append .btn {
+    white-space: nowrap; /* Impede o botão de quebrar linha */
+}
+
+#pesquisarNomeBtn {
+    font-size: 20px;
+    border-radius: 8px;
+}
+
+
 
 .btn-primary {
     background-color: #e60000;
